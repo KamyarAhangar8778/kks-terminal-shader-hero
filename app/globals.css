@@ -1,0 +1,428 @@
+@import 'tailwindcss';
+
+/* Note: @font-face rules for Kode Mono & IRANSans are injected in app/layout.tsx
+   using NEXT_PUBLIC_BASE_PATH so font URLs resolve on both root (/) and GitHub Pages (/kks-terminal-shader-hero). */
+
+@theme {
+  --font-sans:
+    'IRANSans', 'Kode Mono', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
+  --font-vazir: 'IRANSans', 'Kode Mono', system-ui, -apple-system, sans-serif;
+  --font-mono:
+    'Kode Mono', 'IRANSans', Consolas, 'Cascadia Mono', 'SF Mono', Menlo, Monaco,
+    'DejaVu Sans Mono', ui-monospace, monospace;
+}
+
+/* Hide scrollbar across all browsers while keeping scrolling functional */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  box-sizing: border-box;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+  height: 0px;
+}
+
+/* Fluid root font-size scaling for true rem-based adaptive & responsive hierarchy */
+html {
+  font-size: 14px;
+  overflow-x: hidden;
+  max-width: 100vw;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  font-family: 'IRANSans', 'Kode Mono', system-ui, sans-serif;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Adaptive Breakpoint Step Scaling */
+@media (min-width: 480px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1200px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1600px) {
+  html {
+    font-size: 17px;
+  }
+}
+
+body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background-color: #000000;
+  color: #fafafa;
+  font-family: 'IRANSans', 'Kode Mono', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Adaptive & Responsive Structural Container Utility */
+.adaptive-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 480px) {
+  .adaptive-container {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .adaptive-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    max-width: 48rem; /* 768px */
+  }
+}
+
+@media (min-width: 960px) {
+  .adaptive-container {
+    max-width: 60rem; /* 960px */
+  }
+}
+
+@media (min-width: 1200px) {
+  .adaptive-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    max-width: 72rem; /* 1152px - 1200px */
+  }
+}
+
+@media (min-width: 1600px) {
+  .adaptive-container {
+    max-width: 84rem; /* 1344px - 1600px balanced reading width */
+  }
+}
+
+/* Dark Glass Structural Classes */
+.glass-panel {
+  background-color: rgba(12, 12, 15, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background-color: rgba(20, 20, 24, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-input {
+  background-color: rgba(10, 10, 12, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fafafa;
+}
+
+/* IRANSans is the Primary Font for Persian/RTL elements (natural U+0020 space metrics), while U+0021-007E falls through to Kode Mono */
+[dir='rtl'],
+[lang='fa'],
+.font-vazir,
+.font-sans,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+label,
+input,
+textarea,
+button,
+select {
+  font-family:
+    'IRANSans',
+    'Kode Mono',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  word-spacing: -0.04em;
+}
+
+/* Terminal, telemetry, code, and English tech labels strictly utilize Kode Mono */
+.font-mono,
+[dir='ltr'],
+[lang='en'],
+code,
+kbd,
+samp,
+pre {
+  font-family:
+    'Kode Mono', 'IRANSans', Consolas, 'Cascadia Mono', 'SF Mono', Menlo, Monaco,
+    'DejaVu Sans Mono', ui-monospace, monospace !important;
+  word-spacing: normal;
+}
+
+@media (hover: none), (pointer: coarse) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Performance: Keep below-the-fold sections layout-isolated without destroying render trees on scroll */
+#portfolio-showcase-section,
+#contact-inquiry-section,
+#main-app-footer {
+  contain: layout style;
+}
+
+/* ==========================================================================
+   React View Transitions (CSS Animation Recipes & Isolation Rules)
+   ========================================================================== */
+
+:root {
+  --duration-exit: 150ms;
+  --duration-enter: 210ms;
+  --duration-move: 380ms;
+  --bg-page: #0a0a0c;
+  --bg-surface: #111115;
+  --bg-hover: #1a1a20;
+  --border-line: rgba(255, 255, 255, 0.08);
+  --border-ring: rgba(255, 255, 255, 0.18);
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --text-body: #e4e4e7;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vt-slide {
+  from {
+    translate: var(--slide-offset, 0);
+  }
+  to {
+    translate: 0;
+  }
+}
+
+@keyframes vt-slide-y {
+  from {
+    transform: translateY(var(--slide-y-offset, 12px));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes vt-scale-down {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+}
+
+@keyframes vt-scale-up {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes vt-via-blur {
+  30% {
+    filter: blur(2.5px);
+  }
+}
+
+/* Fade In / Out */
+::view-transition-old(.fade-out) {
+  animation: var(--duration-exit) ease-in vt-fade reverse;
+}
+::view-transition-new(.fade-in) {
+  animation: var(--duration-enter) ease-out var(--duration-exit) both vt-fade;
+}
+
+/* Vertical Slide Reveal */
+::view-transition-old(.slide-down) {
+  animation:
+    var(--duration-exit) ease-out both vt-fade reverse,
+    var(--duration-exit) ease-out both vt-slide-y reverse;
+}
+::view-transition-new(.slide-up) {
+  animation:
+    var(--duration-enter) ease-in var(--duration-exit) both vt-fade,
+    var(--duration-move) ease-out both vt-slide-y;
+}
+
+/* Directional Navigation Slides (nav-forward / nav-back) */
+::view-transition-old(.nav-forward) {
+  --slide-offset: -60px;
+  animation:
+    var(--duration-exit) ease-in both vt-fade reverse,
+    var(--duration-move) ease-in-out both vt-slide reverse;
+}
+::view-transition-new(.nav-forward) {
+  --slide-offset: 60px;
+  animation:
+    var(--duration-enter) ease-out var(--duration-exit) both vt-fade,
+    var(--duration-move) ease-in-out both vt-slide;
+}
+::view-transition-old(.nav-back) {
+  --slide-offset: 60px;
+  animation:
+    var(--duration-exit) ease-in both vt-fade reverse,
+    var(--duration-move) ease-in-out both vt-slide reverse;
+}
+::view-transition-new(.nav-back) {
+  --slide-offset: -60px;
+  animation:
+    var(--duration-enter) ease-out var(--duration-exit) both vt-fade,
+    var(--duration-move) ease-in-out both vt-slide;
+}
+
+/* Shared Element Morph */
+::view-transition-group(.morph) {
+  animation-duration: var(--duration-move);
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-image-pair(.morph) {
+  animation-name: vt-via-blur;
+}
+
+/* Text Morph: prevents raster scaling ghost artifacts */
+::view-transition-group(.text-morph) {
+  animation-duration: var(--duration-move);
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-old(.text-morph) {
+  display: none;
+}
+::view-transition-new(.text-morph) {
+  animation: none;
+  object-fit: none;
+  object-position: right top;
+}
+
+/* Scale Animations */
+::view-transition-old(.scale-out) {
+  animation: var(--duration-exit) ease-in vt-scale-down;
+}
+::view-transition-new(.scale-in) {
+  animation: var(--duration-enter) ease-out var(--duration-exit) both vt-scale-up;
+}
+
+/* Sliding Indicator (Tab Pill / Segmented Underline) */
+::view-transition-group(.tab-underline) {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1);
+}
+::view-transition-old(.tab-underline),
+::view-transition-new(.tab-underline) {
+  animation: none;
+  height: 100%;
+}
+
+/* Pass clicks/hover through in-flight animations */
+::view-transition {
+  pointer-events: none;
+}
+
+/* Live Root: Disables full-page stale capture so unnamed chrome stays interactive */
+::view-transition-old(root) {
+  display: none;
+}
+::view-transition-new(root) {
+  animation: none;
+}
+
+/* Persistent Element Isolation: Pinned Reticle, Social Control Cluster, and Footer */
+::view-transition-group(custom-cursor) {
+  animation: none;
+  z-index: 99999;
+}
+::view-transition-old(custom-cursor) {
+  display: none;
+}
+::view-transition-new(custom-cursor) {
+  animation: none;
+}
+
+::view-transition-group(hero-social-nav) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(hero-social-nav) {
+  display: none;
+}
+::view-transition-new(hero-social-nav) {
+  animation: none;
+}
+
+::view-transition-group(main-app-footer) {
+  animation: none;
+  z-index: 40;
+}
+::view-transition-old(main-app-footer) {
+  display: none;
+}
+::view-transition-new(main-app-footer) {
+  animation: none;
+}
+
+/* Accessibility: Gracefully disable animations and transitions for users preferring reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

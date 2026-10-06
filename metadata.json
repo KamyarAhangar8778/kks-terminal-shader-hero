@@ -1,0 +1,6 @@
+{
+  "name": "KKS Terminal Shader Hero",
+  "description": "Web portfolio with an animated terminal character grid, CRT screen effect, project showcase, and inquiry contact form.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
