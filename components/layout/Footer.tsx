@@ -1,26 +1,9 @@
 'use client';
 
 import React from 'react';
-import dynamic from 'next/dynamic';
-import { LazyMotion, domAnimation, m } from 'motion/react';
 import { ArrowUp, Terminal, ShieldCheck, ArrowUpRight } from 'lucide-react';
-import { MOTION_EASINGS } from '@/lib/motion-tokens';
-import { useReducedMotionPreference } from '@/hooks/use-motion-preference';
+import { DigitalFireContainer } from '@/components/digital-fire/DigitalFireContainer';
 import { FEATURE_FLAGS, SITE_CONFIG } from '@/lib/app-config';
-
-const DigitalFireContainer = dynamic(
-  () =>
-    import('@/components/digital-fire/DigitalFireContainer').then((m) => m.DigitalFireContainer),
-  {
-    ssr: false,
-    loading: () => (
-      <div
-        className="relative w-full h-[140px] sm:h-[180px] md:h-[220px] bg-[#000000]"
-        aria-hidden="true"
-      />
-    ),
-  }
-);
 
 /**
  * Smooth scroll to top of the page.
@@ -40,8 +23,6 @@ function scrollToTop(): void {
  * @returns {React.ReactElement} The rendered Footer.
  */
 export const Footer: React.FC = () => {
-  const prefersReducedMotion = useReducedMotionPreference();
-
   return (
     <footer
       id="main-app-footer"
@@ -89,7 +70,7 @@ export const Footer: React.FC = () => {
                         link.isExternal && FEATURE_FLAGS.openLinksInNewTab ? '_blank' : undefined
                       }
                       rel={link.isExternal ? 'noopener noreferrer' : undefined}
-                      aria-label={link.ariaLabel}
+                      aria-label={`${link.label} - ${link.ariaLabel}`}
                       className="text-zinc-300 hover:text-emerald-300 transition-colors flex items-center justify-between group py-1.5 px-1.5 min-h-[38px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                     >
                       <span className="flex items-center gap-1 whitespace-nowrap">
@@ -120,20 +101,15 @@ export const Footer: React.FC = () => {
           </small>
 
           {FEATURE_FLAGS.backToTopButton ? (
-            <LazyMotion features={domAnimation}>
-              <m.button
-                type="button"
-                onClick={scrollToTop}
-                whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
-                whileTap={prefersReducedMotion ? undefined : { scale: 0.97 }}
-                transition={{ duration: 0.12, ease: MOTION_EASINGS.entrance }}
-                aria-label="بازگشت به ابتدای صفحه"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(12,12,15,0.85)] border border-white/[0.12] hover:border-emerald-500/60 hover:bg-emerald-950/20 text-xs text-zinc-200 hover:text-emerald-300 transition-colors duration-200 min-h-[38px] whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-              >
-                <ArrowUp className="w-3 h-3 text-emerald-400 shrink-0" aria-hidden="true" />
-                <span>{SITE_CONFIG.telemetry.backToTopLabel}</span>
-              </m.button>
-            </LazyMotion>
+            <button
+              type="button"
+              onClick={scrollToTop}
+              aria-label={`${SITE_CONFIG.telemetry.backToTopLabel} - بازگشت به ابتدای صفحه`}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(12,12,15,0.85)] border border-white/[0.12] hover:border-emerald-500/60 hover:bg-emerald-950/20 text-xs text-zinc-200 hover:text-emerald-300 transition-all duration-150 hover:scale-[1.02] active:scale-[0.97] motion-reduce:transform-none min-h-[38px] whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            >
+              <ArrowUp className="w-3 h-3 text-emerald-400 shrink-0" aria-hidden="true" />
+              <span>{SITE_CONFIG.telemetry.backToTopLabel}</span>
+            </button>
           ) : null}
         </div>
       </div>

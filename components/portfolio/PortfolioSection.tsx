@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { ProjectCard } from './ProjectCard';
-import { ProjectDetailModal } from './ProjectDetailModal';
 import { PortfolioFilterTabs } from './PortfolioFilterTabs';
 import {
   PortfolioStateProvider,
@@ -13,6 +13,11 @@ import {
 } from './PortfolioCompound';
 
 import type { PortfolioProject } from '@/types/portfolio';
+
+const ProjectDetailModal = dynamic(
+  () => import('./ProjectDetailModal').then((m) => m.ProjectDetailModal),
+  { ssr: false }
+);
 
 const renderProjectCard = (project: PortfolioProject) => <ProjectCard project={project} />;
 

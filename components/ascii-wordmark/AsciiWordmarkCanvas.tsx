@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { AsciiWordmarkRenderer } from '@/lib/ascii-wordmark/renderer';
+import type { AsciiWordmarkRenderer } from '@/lib/ascii-wordmark/renderer';
 import { useReducedMotionPreference } from '@/hooks/use-motion-preference';
 
 interface AsciiWordmarkCanvasProps {
@@ -29,9 +29,13 @@ export function AsciiWordmarkCanvas({
     let renderer: AsciiWordmarkRenderer | null = null;
     let isDisposed = false;
 
-    const mountRenderer = () => {
+    const mountRenderer = async () => {
       if (isDisposed || renderer) return;
-      renderer = new AsciiWordmarkRenderer(el, {
+      const { AsciiWordmarkRenderer: RendererClass } = await import(
+        '@/lib/ascii-wordmark/renderer'
+      );
+      if (isDisposed || renderer) return;
+      renderer = new RendererClass(el, {
         word,
         inkColor,
         reducedMotion,
@@ -42,7 +46,7 @@ export function AsciiWordmarkCanvas({
     };
 
     if (typeof IntersectionObserver === 'undefined') {
-      mountRenderer();
+      void mountRenderer();
       return () => {
         isDisposed = true;
         renderer?.dispose();
@@ -53,10 +57,10 @@ export function AsciiWordmarkCanvas({
       (entries) => {
         if (entries[0]?.isIntersecting) {
           bootstrapObserver.disconnect();
-          mountRenderer();
+          void mountRenderer();
         }
       },
-      { rootMargin: '250px' }
+      { rootMargin: '200px' }
     );
 
     bootstrapObserver.observe(el);
@@ -71,6 +75,7 @@ export function AsciiWordmarkCanvas({
   return (
     <div
       ref={containerRef}
+      role="img"
       aria-label={`Interactive ASCII particle display: ${word}`}
       className={`relative w-full h-[325px] sm:h-[320px] md:h-[380px] overflow-hidden select-none pointer-events-auto ${className}`}
     />

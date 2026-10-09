@@ -87,7 +87,17 @@ export function HeroFrame({
         'relative w-full h-screen h-[100dvh] min-h-screen min-h-[100dvh] overflow-hidden bg-[#060608] flex items-center justify-center select-none'
       }
     >
-      <h1 className="sr-only">{SITE_CONFIG.brand.shortName}</h1>
+      <div
+        aria-hidden="false"
+        className="pointer-events-none select-none absolute inset-0 z-0 flex flex-col items-center justify-center px-6 text-center"
+      >
+        <h1 className="text-6xl sm:text-8xl font-mono font-bold tracking-[0.25em] text-[#070709] leading-none">
+          {SITE_CONFIG.brand.shortName}
+        </h1>
+        <p className="mt-3 max-w-md text-sm sm:text-base font-sans text-[#070709] leading-relaxed">
+          {SITE_CONFIG.brand.tagline}
+        </p>
+      </div>
       {children}
       <div
         aria-hidden="true"

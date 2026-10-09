@@ -183,7 +183,9 @@ export const ContactSection: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleCopy(SITE_CONFIG.contact.recipientEmail, 'email')}
-                        aria-label="کپی آدرس ایمیل"
+                        aria-label={
+                          copiedEmail ? 'کپی شد - آدرس ایمیل' : 'کپی ایمیل - کپی آدرس ایمیل'
+                        }
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 hover:text-emerald-300 text-xs font-sans transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                       >
                         {copiedEmail ? (

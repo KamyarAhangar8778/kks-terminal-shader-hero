@@ -1,27 +1,61 @@
+const HEX_RGB01_CACHE = new Map<string, [number, number, number]>();
+const INV_255 = 1 / 255;
+
+const HEX_BYTE_TABLE: string[] = Array.from({ length: 256 }, (_, i) =>
+  i.toString(16).padStart(2, '0')
+);
+
+function hexVal(code: number): number {
+  if (code >= 48 && code <= 57) return code - 48;
+  if (code >= 97 && code <= 102) return code - 87;
+  if (code >= 65 && code <= 70) return code - 55;
+  return 0;
+}
+
+function parseHex24(hex: string): number {
+  const len = hex.length;
+  let start = 0;
+  while (start < len && hex.charCodeAt(start) <= 32) start++;
+  if (start < len && hex.charCodeAt(start) === 35) start++;
+  let end = len;
+  while (end > start && hex.charCodeAt(end - 1) <= 32) end--;
+  const hLen = end - start;
+  if (hLen === 3) {
+    const r = hexVal(hex.charCodeAt(start));
+    const g = hexVal(hex.charCodeAt(start + 1));
+    const b = hexVal(hex.charCodeAt(start + 2));
+    return (r << 20) | (r << 16) | (g << 12) | (g << 8) | (b << 4) | b;
+  }
+  let n = 0;
+  for (let i = start; i < end; i++) {
+    n = (n << 4) | hexVal(hex.charCodeAt(i));
+  }
+  return n;
+}
+
 export function hexToRgb01(hex: string): [number, number, number] {
-  let h = hex.replace('#', '').trim();
-  if (h.length === 3)
-    h = h
-      .split('')
-      .map((c) => c + c)
-      .join('');
-  const n = parseInt(h, 16);
-  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+  const cached = HEX_RGB01_CACHE.get(hex);
+  if (cached) return cached;
+  const n = parseHex24(hex);
+  const res: [number, number, number] = [
+    ((n >> 16) & 255) * INV_255,
+    ((n >> 8) & 255) * INV_255,
+    (n & 255) * INV_255,
+  ];
+  if (HEX_RGB01_CACHE.size < 256) {
+    HEX_RGB01_CACHE.set(hex, res);
+  }
+  return res;
 }
 
 export function hexToHsl(hex: string): [number, number, number] {
-  let h = hex.replace('#', '').trim();
-  if (h.length === 3)
-    h = h
-      .split('')
-      .map((c) => c + c)
-      .join('');
-  const r = parseInt(h.slice(0, 2), 16) / 255;
-  const g = parseInt(h.slice(2, 4), 16) / 255;
-  const b = parseInt(h.slice(4, 6), 16) / 255;
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const l = (max + min) / 2;
+  const n = parseHex24(hex);
+  const r = ((n >> 16) & 255) * INV_255;
+  const g = ((n >> 8) & 255) * INV_255;
+  const b = (n & 255) * INV_255;
+  const max = r > g ? (r > b ? r : b) : g > b ? g : b;
+  const min = r < g ? (r < b ? r : b) : g < b ? g : b;
+  const l = (max + min) * 0.5;
   let s = 0;
   let hue = 0;
   if (max !== min) {
@@ -32,20 +66,28 @@ export function hexToHsl(hex: string): [number, number, number] {
     else hue = (r - g) / d + 4;
     hue *= 60;
   }
-  return [Math.round(hue), Math.round(s * 100), Math.round(l * 100)];
+  return [(hue + 0.5) | 0, (s * 100 + 0.5) | 0, (l * 100 + 0.5) | 0];
 }
 
 export function hslToHex(h: number, s: number, l: number): string {
-  s /= 100;
-  l /= 100;
-  const k = (n: number) => (n + h / 30) % 12;
-  const a = s * Math.min(l, 1 - l);
-  const f = (n: number) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-  const to = (n: number) =>
-    Math.round(255 * f(n))
-      .toString(16)
-      .padStart(2, '0');
-  return `#${to(0)}${to(8)}${to(4)}`;
+  const sn = s * 0.01;
+  const ln = l * 0.01;
+  const a = sn * (ln < 1 - ln ? ln : 1 - ln);
+  const hDiv30 = h / 30;
+
+  const k0 = hDiv30 % 12;
+  const m0 = k0 - 3 < 9 - k0 ? (k0 - 3 < 1 ? k0 - 3 : 1) : 9 - k0 < 1 ? 9 - k0 : 1;
+  const r = ((255 * (ln - a * (m0 > -1 ? m0 : -1)) + 0.5) | 0) & 255;
+
+  const k8 = (8 + hDiv30) % 12;
+  const m8 = k8 - 3 < 9 - k8 ? (k8 - 3 < 1 ? k8 - 3 : 1) : 9 - k8 < 1 ? 9 - k8 : 1;
+  const g = ((255 * (ln - a * (m8 > -1 ? m8 : -1)) + 0.5) | 0) & 255;
+
+  const k4 = (4 + hDiv30) % 12;
+  const m4 = k4 - 3 < 9 - k4 ? (k4 - 3 < 1 ? k4 - 3 : 1) : 9 - k4 < 1 ? 9 - k4 : 1;
+  const b = ((255 * (ln - a * (m4 > -1 ? m4 : -1)) + 0.5) | 0) & 255;
+
+  return `#${HEX_BYTE_TABLE[r]!}${HEX_BYTE_TABLE[g]!}${HEX_BYTE_TABLE[b]!}`;
 }
 
 export const isHex = (s: string): boolean => /^#?[0-9a-fA-F]{6}$/.test(s.trim());

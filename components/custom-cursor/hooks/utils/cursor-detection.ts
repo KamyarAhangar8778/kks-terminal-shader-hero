@@ -14,20 +14,34 @@ export function isTouchDevice(): boolean {
 }
 
 const CLICKABLE_SELECTOR =
-  'a, button, input, select, textarea, [role="button"], .cursor-pointer, [onclick]';
+  'a, button, input, select, textarea, [role="button"], [data-interactive="true"], .cursor-pointer, [onclick]';
 
 const TEXT_SELECTOR = 'p, h1, h2, h3, h4, h5, h6, span, label, li, blockquote, code, pre';
 
+const targetStateCache = new WeakMap<HTMLElement, number>();
+
+function getTargetCursorBits(target: HTMLElement): number {
+  const cached = targetStateCache.get(target);
+  if (cached !== undefined) return cached;
+  const isClick =
+    typeof target.closest === 'function' && Boolean(target.closest(CLICKABLE_SELECTOR));
+  const isText =
+    !isClick && typeof target.closest === 'function' && Boolean(target.closest(TEXT_SELECTOR));
+  const bits = isClick ? 1 : isText ? 2 : 0;
+  targetStateCache.set(target, bits);
+  return bits;
+}
+
 /**
  * Highly optimized check to see if an element or its ancestors are clickable.
- * Avoids getComputedStyle to prevent layout reflow thrashing.
+ * Avoids getComputedStyle to prevent layout reflow thrashing and memoizes DOM lookups via WeakMap.
  *
  * @param {HTMLElement | null} target - Target element to inspect.
  * @returns {boolean} True if element is an interactive clickable target.
  */
 export function checkClickable(target: HTMLElement | null): boolean {
   if (!target) return false;
-  return Boolean(target.closest(CLICKABLE_SELECTOR));
+  return (getTargetCursorBits(target) & 1) !== 0;
 }
 
 /**
@@ -39,5 +53,5 @@ export function checkClickable(target: HTMLElement | null): boolean {
  */
 export function checkHoveringText(target: HTMLElement | null, isClickable: boolean): boolean {
   if (!target || isClickable) return false;
-  return Boolean(target.closest(TEXT_SELECTOR));
+  return (getTargetCursorBits(target) & 2) !== 0;
 }

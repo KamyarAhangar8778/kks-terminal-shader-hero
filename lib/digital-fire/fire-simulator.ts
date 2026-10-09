@@ -4,13 +4,14 @@
  */
 
 import { FIRE_HEAT_LEVELS } from './fire-palettes';
-import { EmberParticle } from './types';
+import type { EmberParticle } from './types';
 
 const MIN_COLS = 10;
 const MIN_ROWS = 8;
 const MAX_EMBERS = 40;
 const EMBER_SPAWN_HEAT_THRESHOLD = 16;
 const EMBER_GLYPHS = ['·', '*', '•', "'", '^', '.', '0', '1'] as const;
+const INV_UINT32 = 1 / 4294967296;
 
 /**
  * کلاس مدیریت شبیه‌سازی آتش دیجیتالی با کارایی بالا (Zero Allocation در حلقه رندر)
@@ -29,6 +30,7 @@ export class FireSimulator {
   private sinWave3: Float32Array;
   private cosWave3: Float32Array;
   private fuelBed: Float32Array;
+  private rngState = 0x9e3779b9;
 
   private readonly maxEmbers = MAX_EMBERS;
   private readonly emberPool: EmberParticle[] = Array.from({ length: MAX_EMBERS }, () => ({
@@ -191,6 +193,7 @@ export class FireSimulator {
     const bottomRowOffset = (rows - 1) * cols;
     const secondBottomRowOffset = bottomRowOffset - cols;
     const maxColIndex = cols - 1;
+    let rng = this.rngState | 1;
 
     // ضرایب زمانی امواج رونده متقابل (Counter-Propagating Traveling Waves) بدون گره ایستا و بدون انحراف خالص
     const t1 = tick * 0.09;
@@ -204,6 +207,8 @@ export class FireSimulator {
     const cosT3 = Math.cos(t3);
 
     const { sinWave1, cosWave1, sinWave2, cosWave2, sinWave3, cosWave3 } = this;
+    const coreBoostThresh = (maxHeat * 0.72) | 0;
+    const hasSecondBottom = rows > 2;
 
     // ۱. تکامل بستر سوخت متلاطم در کف آتش (ایجاد کانون‌های شعله‌ور بلند و شکاف‌های طبیعی هوا)
     for (let x = 0; x < cols; x++) {
@@ -211,10 +216,19 @@ export class FireSimulator {
       const rightF = fuelBed[x < maxColIndex ? x + 1 : maxColIndex]!;
       let f = fuelBed[x]! * 0.82 + (leftF + rightF) * 0.09;
 
-      const r = Math.random();
+      rng ^= rng << 13;
+      rng ^= rng >>> 17;
+      rng ^= rng << 5;
+      const r = (rng >>> 0) * INV_UINT32;
+
       if (r < 0.065) {
         // فوران ناگهانی زبانه آتش در کانون‌های محلی
-        f = Math.min(1.0, f + 0.42 + Math.random() * 0.35);
+        rng ^= rng << 13;
+        rng ^= rng >>> 17;
+        rng ^= rng << 5;
+        const r2 = (rng >>> 0) * INV_UINT32;
+        const boosted = f + 0.42 + r2 * 0.35;
+        f = boosted < 1.0 ? boosted : 1.0;
       } else if (r > 0.945) {
         // مکش هوای سرد بین زبانه‌ها برای شکستن حالت خطی شعله گاز
         f *= 0.28;
@@ -229,19 +243,25 @@ export class FireSimulator {
       const waveSlow = cosWave3[x]! * cosT3 - sinWave3[x]! * sinT3;
       const travelingWave = (waveRight * 0.38 + waveLeft * 0.34 + waveSlow * 0.28 + 1.0) * 0.5;
 
-      const crackle = Math.random() * 0.26;
+      rng ^= rng << 13;
+      rng ^= rng >>> 17;
+      rng ^= rng << 5;
+      const crackle = (rng >>> 0) * INV_UINT32 * 0.26;
       const rawEnergy = f * 0.62 + travelingWave * 0.34 + crackle;
       // توان غیرخطی برای ایجاد کنتراست بالا بین هسته‌های سفید-طلایی و شکاف‌های تیره
-      const shapedEnergy = rawEnergy > 0.38 ? Math.min(1.0, rawEnergy * 1.18) : rawEnergy * 0.65;
-      const calculatedHeat = Math.min(maxHeat, Math.max(2, (shapedEnergy * maxHeat) | 0));
+      const shapedEnergy =
+        rawEnergy > 0.38 ? (rawEnergy * 1.18 < 1.0 ? rawEnergy * 1.18 : 1.0) : rawEnergy * 0.65;
+      const rawCalc = (shapedEnergy * maxHeat) | 0;
+      const calculatedHeat = rawCalc > maxHeat ? maxHeat : rawCalc > 2 ? rawCalc : 2;
 
       heatBuffer[bottomRowOffset + x] = calculatedHeat;
-      if (rows > 2) {
-        const coreBoost = calculatedHeat > maxHeat * 0.72 ? 0.94 : 0.76;
-        heatBuffer[secondBottomRowOffset + x] = Math.min(
-          maxHeat,
-          (calculatedHeat * (coreBoost + Math.random() * 0.12)) | 0
-        );
+      if (hasSecondBottom) {
+        const coreBoost = calculatedHeat > coreBoostThresh ? 0.94 : 0.76;
+        rng ^= rng << 13;
+        rng ^= rng >>> 17;
+        rng ^= rng << 5;
+        const subHeat = (calculatedHeat * (coreBoost + (rng >>> 0) * INV_UINT32 * 0.12)) | 0;
+        heatBuffer[secondBottomRowOffset + x] = subHeat < maxHeat ? subHeat : maxHeat;
       }
     }
 
@@ -249,20 +269,26 @@ export class FireSimulator {
     const upperTipsThreshold = (rows * 0.36) | 0;
     const midFlameThreshold = (rows * 0.7) | 0;
     const roundedWind = wind !== 0 ? Math.round(wind) : 0;
+    const buoyantThresh = (maxHeat * 0.68) | 0;
+    const pocketThresh = (maxHeat * 0.42) | 0;
+    const sustainThresh = (maxHeat * 0.76) | 0;
 
     for (let y = 1; y < rows; y++) {
       const srcRowOffset = y * cols;
       const dstRowOffset = srcRowOffset - cols;
       const belowRowOffset = y + 1 < rows ? srcRowOffset + cols : srcRowOffset;
       const baseDecay = y < upperTipsThreshold ? 2 : y < midFlameThreshold ? 1 : 0;
+      const canSustain = y > upperTipsThreshold;
       // موج برشی گردابه‌ای متقارن در ارتفاع شعله
-      const rowSwirlPhase = Math.sin(y * 0.42 - t1 * 1.3);
+      const rowSwirlPhase = Math.sin(y * 0.42 - t1 * 1.3) * 0.14;
 
       for (let x = 0; x < cols; x++) {
         let jitter = roundedWind;
         if (wind === 0) {
-          const localCurl = sinWave2[x]! * rowSwirlPhase;
-          const rand = Math.random() + localCurl * 0.14;
+          rng ^= rng << 13;
+          rng ^= rng >>> 17;
+          rng ^= rng << 5;
+          const rand = (rng >>> 0) * INV_UINT32 + sinWave2[x]! * rowSwirlPhase;
           if (rand < 0.29) {
             jitter = -1;
           } else if (rand > 0.71) {
@@ -270,20 +296,22 @@ export class FireSimulator {
           }
         }
 
-        const sampleX = Math.max(0, Math.min(maxColIndex, x + jitter));
+        let sampleX = x + jitter;
+        if (sampleX < 0) sampleX = 0;
+        else if (sampleX > maxColIndex) sampleX = maxColIndex;
         const leftX = x > 0 ? x - 1 : 0;
         const rightX = x < maxColIndex ? x + 1 : maxColIndex;
 
-        const advectedHeat = heatBuffer[srcRowOffset + sampleX] ?? 0;
-        const centerHeat = heatBuffer[srcRowOffset + x] ?? 0;
-        const leftHeat = heatBuffer[srcRowOffset + leftX] ?? 0;
-        const rightHeat = heatBuffer[srcRowOffset + rightX] ?? 0;
-        const deepHeat = heatBuffer[belowRowOffset + sampleX] ?? 0;
+        const advectedHeat = heatBuffer[srcRowOffset + sampleX]!;
+        const centerHeat = heatBuffer[srcRowOffset + x]!;
+        const leftHeat = heatBuffer[srcRowOffset + leftX]!;
+        const rightHeat = heatBuffer[srcRowOffset + rightX]!;
+        const deepHeat = heatBuffer[belowRowOffset + sampleX]!;
 
         // حفظ تیزی زبانه‌های شعله با غلبه همرفت عمودی بر پخش افقی
         const neighborAvg = (leftHeat + rightHeat) >> 1;
         const buoyantSource =
-          advectedHeat > maxHeat * 0.68 ? (advectedHeat * 3 + deepHeat) >> 2 : advectedHeat;
+          advectedHeat > buoyantThresh ? (advectedHeat * 3 + deepHeat) >> 2 : advectedHeat;
         const convectedHeat = (buoyantSource * 5 + centerHeat * 2 + neighborAvg) >> 3;
 
         if (convectedHeat <= 0) {
@@ -292,18 +320,29 @@ export class FireSimulator {
         }
 
         // خنک‌سازی لبه‌ای (Pinching) برای باریک شدن طبیعی نوک زبانه‌ها و جدا شدن شعله‌های کوچک در بالا
-        const shearGradient = Math.abs(leftHeat - rightHeat);
-        const edgePinch = shearGradient > 9 && Math.random() < 0.62 ? 2 : shearGradient > 5 ? 1 : 0;
-        const pocketCool =
-          convectedHeat < maxHeat * 0.42 && Math.random() < 0.68 ? 2 : Math.random() < 0.52 ? 1 : 0;
-        // هسته‌های بسیار داغ با افت کمتر صعود می‌کنند تا زبانه‌های بلند و نامتقارن بسازند
-        const coreSustain = convectedHeat > maxHeat * 0.76 && y > upperTipsThreshold ? -1 : 0;
+        const diff = leftHeat - rightHeat;
+        const shearGradient = diff < 0 ? -diff : diff;
+        rng ^= rng << 13;
+        rng ^= rng >>> 17;
+        rng ^= rng << 5;
+        const rPinch = (rng >>> 0) * INV_UINT32;
+        const edgePinch = shearGradient > 9 && rPinch < 0.62 ? 2 : shearGradient > 5 ? 1 : 0;
 
-        const totalDecay = Math.max(0, baseDecay + pocketCool + edgePinch + coreSustain);
-        heatBuffer[dstRowOffset + x] = Math.max(0, convectedHeat - totalDecay);
+        rng ^= rng << 13;
+        rng ^= rng >>> 17;
+        rng ^= rng << 5;
+        const rCool = (rng >>> 0) * INV_UINT32;
+        const pocketCool = convectedHeat < pocketThresh && rCool < 0.68 ? 2 : rCool < 0.52 ? 1 : 0;
+        // هسته‌های بسیار داغ با افت کمتر صعود می‌کنند تا زبانه‌های بلند و نامتقارن بسازند
+        const coreSustain = canSustain && convectedHeat > sustainThresh ? -1 : 0;
+
+        const totalDecay = baseDecay + pocketCool + edgePinch + coreSustain;
+        const nextHeat = convectedHeat - (totalDecay > 0 ? totalDecay : 0);
+        heatBuffer[dstRowOffset + x] = nextHeat > 0 ? nextHeat : 0;
       }
     }
 
+    this.rngState = rng;
     // ۳. به‌روزرسانی اخگرها و جرقه‌های صعودکننده با تغییر رنگ حرارتی
     this.updateEmbers(cols, rows);
   }

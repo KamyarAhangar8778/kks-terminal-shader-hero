@@ -3,7 +3,7 @@
  * @description پالت‌های رنگی و مجموعه کاراکترهای اسکی و یونیکد شبیه به نمونه دوم textart.sh/topic/fire
  */
 
-import { FireCharMode, FirePalette, FirePaletteId } from './types';
+import type { FireCharMode, FirePalette, FirePaletteId } from './types';
 
 /**
  * حداکثر سطح شدت حرارت در ماتریس شبیه‌ساز

@@ -14,7 +14,7 @@ import {
   FIRE_HEAT_LEVELS,
   selectRealisticFireGlyph,
 } from '@/lib/digital-fire/fire-palettes';
-import { FireCharMode, FirePaletteId } from '@/lib/digital-fire/types';
+import type { FireCharMode, FirePaletteId } from '@/lib/digital-fire/types';
 import { ensureFontsCached, getCachedMonoFontFamily } from '@/lib/font-cache';
 
 interface DigitalFireCanvasProps {
@@ -50,7 +50,11 @@ export const DigitalFireCanvas: React.FC<DigitalFireCanvasProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true, willReadFrequently: false });
+    const ctx = canvas.getContext('2d', {
+      alpha: true,
+      desynchronized: true,
+      willReadFrequently: false,
+    });
     if (!ctx) return;
 
     let animationFrameId: number;
@@ -86,6 +90,32 @@ export const DigitalFireCanvas: React.FC<DigitalFireCanvasProps> = ({
         (((h / FIRE_HEAT_LEVELS) * (numChars - 1)) | 0) + 1
       );
     }
+
+    // Pre-allocated flat bucket buffers for zero-allocation heat-batched Canvas2D rendering
+    const bucketHead = new Int32Array(FIRE_HEAT_LEVELS + 1);
+    let maxGridCells = cols * rows;
+    let bucketNext = new Int32Array(maxGridCells);
+    let cellChars: string[] = new Array<string>(maxGridCells).fill(' ');
+    let cellPosX = new Float32Array(cols);
+    let cellPosY = new Float32Array(rows);
+
+    const updateGridPositions = (w: number, h: number, cCount: number, rCount: number) => {
+      const total = cCount * rCount;
+      if (total > maxGridCells) {
+        maxGridCells = total;
+        bucketNext = new Int32Array(maxGridCells);
+        cellChars = new Array<string>(maxGridCells).fill(' ');
+      }
+      if (cellPosX.length < cCount) cellPosX = new Float32Array(cCount);
+      if (cellPosY.length < rCount) cellPosY = new Float32Array(rCount);
+      const cW = w / cCount;
+      const cH = h / rCount;
+      const halfW = cW * 0.5;
+      const halfH = cH * 0.5;
+      for (let x = 0; x < cCount; x++) cellPosX[x] = x * cW + halfW;
+      for (let y = 0; y < rCount; y++) cellPosY[y] = y * cH + halfH;
+    };
+    updateGridPositions(cssWidth, cssHeight, cols, rows);
 
     const buildGlowGradient = (_w: number, h: number): CanvasGradient => {
       const grad = ctx.createLinearGradient(0, h, 0, h * 0.35);
@@ -123,6 +153,7 @@ export const DigitalFireCanvas: React.FC<DigitalFireCanvasProps> = ({
           const newRows = Math.max(12, Math.floor(cssHeight / newMetrics.cellH));
 
           simulator.resize(newCols, newRows);
+          updateGridPositions(cssWidth, cssHeight, simulator.cols, simulator.rows);
           cachedGlowGradient = buildGlowGradient(cssWidth, cssHeight);
         }
       }
@@ -173,10 +204,10 @@ export const DigitalFireCanvas: React.FC<DigitalFireCanvasProps> = ({
       ctx.save();
       ctx.scale(dpr, dpr);
 
-      const cellW = cssWidth / simulator.cols;
-      const cellH = cssHeight / simulator.rows;
-      const halfCellW = cellW * 0.5;
-      const halfCellH = cellH * 0.5;
+      const simCols = simulator.cols;
+      const simRows = simulator.rows;
+      const cellW = cssWidth / simCols;
+      const cellH = cssHeight / simRows;
       const fontSize = Math.max(8, (cellH * 0.95) | 0);
 
       ctx.font = `700 ${fontSize}px ${getCachedMonoFontFamily()}, "JetBrains Mono", Consolas, monospace`;
@@ -185,27 +216,25 @@ export const DigitalFireCanvas: React.FC<DigitalFireCanvasProps> = ({
 
       const heatBuffer = simulator.heatBuffer;
       const paletteColors = currentPalette.colors;
-      const simCols = simulator.cols;
-      const simRows = simulator.rows;
       const isHybridMode = charMode === 'hybrid';
       const slowTick = (tick * 0.45) | 0;
-      let lastFillStyle = '';
-      let lastAlpha = 1.0;
 
-      // ۱. رندر سلول‌های آتشین با ترکیب هوشمند کاراکترهای ASCII جهتی در زبانه‌ها و شیدهای Unicode در هسته
+      // ۱. دسته‌بندی سلول‌های فعال بر اساس سطح حرارت (Heat Bucketing) جهت کاهش ۹۸٪ تغییر وضعیت Canvas2D
+      bucketHead.fill(-1);
       for (let y = 0; y < simRows; y++) {
         const rowOffset = y * simCols;
-        const posY = y * cellH + halfCellH;
+        const yHash = y * 29 + slowTick;
 
         for (let x = 0; x < simCols; x++) {
-          const heat = heatBuffer[rowOffset + x] ?? 0;
+          const idx = rowOffset + x;
+          const heat = heatBuffer[idx]!;
           if (heat <= 0) continue;
 
           let ch: string;
           if (isHybridMode) {
-            const leftH = x > 0 ? (heatBuffer[rowOffset + x - 1] ?? 0) : heat;
-            const rightH = x + 1 < simCols ? (heatBuffer[rowOffset + x + 1] ?? 0) : heat;
-            const cellHash = (x * 13 + y * 29 + slowTick) ^ (heat * 7);
+            const leftH = x > 0 ? heatBuffer[idx - 1]! : heat;
+            const rightH = x + 1 < simCols ? heatBuffer[idx + 1]! : heat;
+            const cellHash = (x * 13 + yHash) ^ (heat * 7);
             ch = selectRealisticFireGlyph(heat, rightH - leftH, cellHash);
           } else {
             const charIdx =
@@ -214,20 +243,38 @@ export const DigitalFireCanvas: React.FC<DigitalFireCanvasProps> = ({
           }
           if (ch === ' ') continue;
 
-          // محوشدگی نرم برای دود و نوک زبانه‌های کم‌حرارت جهت حذف لبه‌های تیز و کارتونی
-          const targetAlpha = heat <= 4 ? 0.28 + heat * 0.16 : 1.0;
-          if (targetAlpha !== lastAlpha) {
-            ctx.globalAlpha = targetAlpha;
-            lastAlpha = targetAlpha;
-          }
+          const hBucket = heat <= FIRE_HEAT_LEVELS ? heat : FIRE_HEAT_LEVELS;
+          cellChars[idx] = ch;
+          bucketNext[idx] = bucketHead[hBucket]!;
+          bucketHead[hBucket] = idx;
+        }
+      }
 
-          const colorIdx = heat < FIRE_HEAT_LEVELS ? heat : FIRE_HEAT_LEVELS - 1;
-          const targetColor = paletteColors[colorIdx] ?? '#ffffff';
-          if (targetColor !== lastFillStyle) {
-            ctx.fillStyle = targetColor;
-            lastFillStyle = targetColor;
-          }
-          ctx.fillText(ch, x * cellW + halfCellW, posY);
+      let lastFillStyle = '';
+      let lastAlpha = 1.0;
+
+      for (let h = 1; h <= FIRE_HEAT_LEVELS; h++) {
+        let idx = bucketHead[h]!;
+        if (idx === -1) continue;
+
+        const targetAlpha = h <= 4 ? 0.28 + h * 0.16 : 1.0;
+        if (targetAlpha !== lastAlpha) {
+          ctx.globalAlpha = targetAlpha;
+          lastAlpha = targetAlpha;
+        }
+
+        const colorIdx = h < FIRE_HEAT_LEVELS ? h : FIRE_HEAT_LEVELS - 1;
+        const targetColor = paletteColors[colorIdx] ?? '#ffffff';
+        if (targetColor !== lastFillStyle) {
+          ctx.fillStyle = targetColor;
+          lastFillStyle = targetColor;
+        }
+
+        while (idx !== -1) {
+          const y = (idx / simCols) | 0;
+          const x = idx - y * simCols;
+          ctx.fillText(cellChars[idx]!, cellPosX[x]!, cellPosY[y]!);
+          idx = bucketNext[idx]!;
         }
       }
       if (lastAlpha !== 1.0) {

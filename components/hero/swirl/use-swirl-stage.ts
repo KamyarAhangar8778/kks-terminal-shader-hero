@@ -15,7 +15,7 @@ import {
   type WavePattern,
 } from './vortex-field';
 import { depositTrail, makeTrailField, stepTrail } from './trail-field';
-import { renderWord, type FontStyle } from './block-font';
+import type { FontStyle } from './block-font';
 
 export interface StageConfig {
   rows?: string[];
@@ -70,7 +70,7 @@ export interface StageHandle {
 
 function resolveTarget(c: StageConfig): Target {
   if (c.rows && c.rows.length) return makeTarget(c.rows);
-  return makeTarget(renderWord(c.word ?? ' ', c.style ?? 'slant'));
+  return makeTarget([c.word ?? ' ']);
 }
 
 function targetKey(c: StageConfig): string {
@@ -141,6 +141,7 @@ export function useSwirlStage(
     if (typeof ResizeObserver !== 'undefined') {
       ro = new ResizeObserver(() => {
         sizeDirty = true;
+        if (visible && firstFramePainted) startLoop();
       });
       ro.observe(canvas);
     }
@@ -198,13 +199,17 @@ export function useSwirlStage(
     let startTime = 0;
     let prevTime = 0;
     let raf = 0;
+    let paceTimer: ReturnType<typeof setTimeout> | null = null;
     let settled = false;
     let firstFramePainted = false;
+    const isCoarsePointer =
+      typeof window !== 'undefined' &&
+      (window.matchMedia?.('(pointer: coarse)').matches ?? false);
 
     const FORMATION_SETTLE_SEC = 1.8;
 
     function startLoop() {
-      if (raf !== 0) return;
+      if (raf !== 0 || paceTimer !== null) return;
       prevTime = 0;
       raf = requestAnimationFrame(frame);
     }
@@ -213,17 +218,23 @@ export function useSwirlStage(
         cancelAnimationFrame(raf);
         raf = 0;
       }
+      if (paceTimer !== null) {
+        clearTimeout(paceTimer);
+        paceTimer = null;
+      }
     }
 
     handle.current = {
       replay: () => {
         startTime = 0;
+        startLoop();
       },
       setPointer: (p) => {
         if (p) {
           pointer.x = p.x;
           pointer.y = p.y;
           pointer.active = true;
+          startLoop();
         } else {
           pointer.active = false;
         }
@@ -231,10 +242,12 @@ export function useSwirlStage(
       burst: (x, y) => {
         shocks.push({ x, y, age: 0 });
         if (shocks.length > 4) shocks.shift();
+        startLoop();
       },
     };
 
     function frame(time: number) {
+      const frameStart = performance.now();
       const c = cfgRef.current;
       if (c.text !== lastText) {
         lastText = c.text;
@@ -259,7 +272,8 @@ export function useSwirlStage(
       if (sizeDirty || lastCw <= 0 || lastCh <= 0) {
         const layoutW = canvas!.clientWidth || canvas!.getBoundingClientRect().width;
         const layoutH = canvas!.clientHeight || canvas!.getBoundingClientRect().height;
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const maxDpr = layoutW < 768 || isCoarsePointer || r!.isSoftware ? 1 : 2;
+        const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
         const cw = round(layoutW * dpr);
         const ch = round(layoutH * dpr);
         if (cw > 0 && ch > 0) {
@@ -277,7 +291,7 @@ export function useSwirlStage(
 
       if (grid && atlas && buffers && cw > 0 && ch > 0) {
         if (startTime === 0) {
-          startTime = time;
+          startTime = r!.isSoftware ? time - FORMATION_SETTLE_SEC * 1000 : time;
           settled = false;
           eventsRef?.current?.onFormationStart?.();
         }
@@ -381,7 +395,19 @@ export function useSwirlStage(
         }
       }
       raf = 0;
-      if (visible) raf = requestAnimationFrame(frame);
+      const shouldContinue =
+        visible && (!r!.isSoftware || shocks.length > 0 || pointer.active || sizeDirty);
+      if (shouldContinue) {
+        const frameCost = performance.now() - frameStart;
+        if (frameCost > 14) {
+          paceTimer = setTimeout(() => {
+            paceTimer = null;
+            if (visible && raf === 0) raf = requestAnimationFrame(frame);
+          }, Math.min(100, round(frameCost * 1.5)));
+        } else {
+          raf = requestAnimationFrame(frame);
+        }
+      }
     }
 
     let cancelled = false;

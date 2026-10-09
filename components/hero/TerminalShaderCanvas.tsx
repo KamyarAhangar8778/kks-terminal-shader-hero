@@ -114,7 +114,7 @@ export const TerminalShaderCanvas: React.FC<TerminalShaderCanvasProps> = ({
       ref={canvasRef}
       onPointerDown={handlePointerDown}
       style={{ opacity: painted ? 1 : 0 }}
-      className="absolute inset-0 block w-full h-full cursor-pointer select-none z-0 transition-opacity duration-500 ease-out motion-reduce:transition-none touch-manipulation"
+      className="absolute inset-0 block w-full h-full cursor-pointer select-none z-[1] transition-opacity duration-500 ease-out motion-reduce:transition-none touch-manipulation"
     />
   );
 };

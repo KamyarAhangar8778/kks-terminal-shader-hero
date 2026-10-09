@@ -140,20 +140,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="font/woff2"
           crossOrigin="anonymous"
         />
-        <link
-          rel="preload"
-          href={`${BASE_PATH}/fonts/IRANSansWeb-Medium.woff2`}
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href={`${BASE_PATH}/fonts/IRANSansWeb-Bold.woff2`}
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
         <style
           id="kks-font-faces"
           dangerouslySetInnerHTML={{
@@ -168,44 +154,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className="font-sans antialiased bg-[#000000] text-[#fafafa] selection:bg-emerald-500/25 selection:text-emerald-100"
         suppressHydrationWarning
       >
-        {/* Instant pre-hydration ASCII line loader */}
-        {FEATURE_FLAGS.initialLoader ? (
-          <div
-            id="pre-hydration-loader"
-            suppressHydrationWarning
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 99999,
-              backgroundColor: '#000000',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#e4e4e7',
-              fontFamily: 'var(--font-mono), "Kode Mono", monospace',
-              fontSize: '32px',
-              userSelect: 'none',
-            }}
-            dangerouslySetInnerHTML={{
-              __html: `
-                <span id="pre-ascii-char">|</span>
-                <script>
-                  (function() {
-                    var f = ['|', '/', '-', '\\\\'];
-                    var i = 0;
-                    var el = document.getElementById('pre-ascii-char');
-                    if (el) {
-                      window.__asciiPreInterval = setInterval(function() {
-                        i = (i + 1) % f.length;
-                        el.textContent = f[i];
-                      }, 200);
-                    }
-                  })();
-                </script>
-              `,
-            }}
-          />
-        ) : null}
         {FEATURE_FLAGS.initialLoader ? <InitialAppLoader /> : null}
         {FEATURE_FLAGS.customCursor ? <CustomCursor /> : null}
         {children}

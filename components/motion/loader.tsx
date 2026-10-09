@@ -159,8 +159,9 @@ const VARIANT_COMPONENTS: Partial<Record<LoaderVariant, React.ComponentType<Part
 /**
  * Universal Loader component rendering any chosen motion variant.
  * Supports standard ASCII line spinner: `variant="ascii-line"`.
+ * @public
  */
-function Loader({
+export function Loader({
   variant = 'spinner',
   size = 32,
   speed,
@@ -170,7 +171,6 @@ function Loader({
   const reduce = useReducedMotion() ?? false;
   const effectiveSpeed = speed ?? (variant === 'ascii-line' ? 0.8 : 1);
   const asciiFrames = ASCII_SETS[variant];
-  const VariantComponent = VARIANT_COMPONENTS[variant];
 
   if (asciiFrames) {
     return (
@@ -184,6 +184,8 @@ function Loader({
       </span>
     );
   }
+
+  const VariantComponent = VARIANT_COMPONENTS[variant];
 
   return (
     <LazyMotion features={domAnimation}>
@@ -201,8 +203,12 @@ function Loader({
   );
 }
 
+const ASCII_LINE_FRAMES = ASCII_SETS['ascii-line'] ?? ['|', '/', '-', '\\'];
+
 /**
  * Preconfigured ASCII Line Loader cycling through ["|", "/", "-", "\\"].
+ * Directly renders the lightweight Ascii cycle so heavy SVG variants in VARIANT_COMPONENTS
+ * can be tree-shaken when only AsciiLineLoader is imported.
  */
 export function AsciiLineLoader({
   size = 16,
@@ -210,7 +216,15 @@ export function AsciiLineLoader({
   label = 'Processing',
   className,
 }: Omit<LoaderProps, 'variant'>): React.JSX.Element {
+  const reduce = useReducedMotion() ?? false;
   return (
-    <Loader variant="ascii-line" size={size} speed={speed} label={label} className={className} />
+    <span
+      role="status"
+      aria-label={label}
+      className={cn('inline-flex items-center justify-center text-foreground', className)}
+    >
+      <Ascii frames={ASCII_LINE_FRAMES} size={size} speed={speed} reduce={reduce} />
+      <span className="sr-only">{label}</span>
+    </span>
   );
 }

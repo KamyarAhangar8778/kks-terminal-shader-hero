@@ -181,9 +181,9 @@ Source code dependencies strictly point inward from framework/UI drivers toward 
 
 ### Decision Log
 
-| Date       | Phase       | Architectural Decision                                                                | Rationale                                                                                                     |
-| :--------- | :---------- | :------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------ |
-| 2026-09-28 | Phase 4 & 5 | React 19 Compound Components with `{ state, actions, meta }` DI contexts              | Decouples UI layout from state hooks and eliminates prop drilling across Hero, Portfolio, and Contact modules |
-| 2026-09-28 | Phase 3 & 8 | Pre-allocated typed buffers (`SINE_LUT`, `shockwavePool`, `emberPool`, `ATLAS_CACHE`) | Eliminates garbage collection pauses during 60FPS canvas rendering                                            |
-| 2026-09-28 | Phase 7 & 9 | Worker error isolation (`onerror`/`onmessageerror`) & WebGL context loss recovery     | Ensures GPU sleep or worker failure degrades gracefully without crashing the host application                 |
+| Date       | Phase       | Architectural Decision                                                                | Rationale                                                                                                        |
+| :--------- | :---------- | :------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------- |
+| 2026-09-28 | Phase 4 & 5 | React 19 Compound Components with `{ state, actions, meta }` DI contexts              | Decouples UI layout from state hooks and eliminates prop drilling across Hero, Portfolio, and Contact modules    |
+| 2026-09-28 | Phase 3 & 8 | Pre-allocated typed buffers (`SINE_LUT`, `shockwavePool`, `emberPool`, `ATLAS_CACHE`) | Eliminates garbage collection pauses during 60FPS canvas rendering                                               |
+| 2026-09-28 | Phase 7 & 9 | Worker error isolation (`onerror`/`onmessageerror`) & WebGL context loss recovery     | Ensures GPU sleep or worker failure degrades gracefully without crashing the host application                    |
 | 2026-10-06 | Directive   | Explicit No-Test-Files Policy                                                         | Project policy directive removes unit test files; QA is enforced via ESLint, tsc, and Next.js build verification |

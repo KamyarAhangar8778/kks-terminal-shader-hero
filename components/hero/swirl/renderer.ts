@@ -3,6 +3,7 @@ import type { FieldBuffers, FieldGrid } from './vortex-field';
 
 export interface Renderer {
   gl: WebGL2RenderingContext;
+  isSoftware: boolean;
   glyphTex: WebGLTexture;
   scratch: HTMLCanvasElement;
   resizeTargets: (cw: number, ch: number) => void;
@@ -38,6 +39,14 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
   });
   if (!gl) return null;
   gl.disable(gl.DEPTH_TEST);
+
+  const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+  const rendererName = String(
+    (dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : '') ||
+      gl.getParameter(gl.RENDERER) ||
+      ''
+  );
+  const isSoftware = /SwiftShader|llvmpipe|Software|Basic Render/i.test(rendererName);
 
   const scratch = document.createElement('canvas');
   if (!scratch.getContext('2d')) return null;
@@ -159,6 +168,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer | null {
 
   return {
     gl,
+    isSoftware,
     glyphTex,
     scratch,
     resizeTargets(cw, ch) {

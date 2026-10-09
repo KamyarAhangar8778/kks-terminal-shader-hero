@@ -10,8 +10,8 @@ import React, {
   Suspense,
 } from 'react';
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'motion/react';
-import dynamic from 'next/dynamic';
 import { GeometricBackground } from '@/components/common/GeometricBackground';
+import { AsciiWordmarkCanvas } from '@/components/ascii-wordmark/AsciiWordmarkCanvas';
 import { ViewTransition } from '@/components/view-transitions/ViewTransition';
 import { addTransitionType } from '@/components/view-transitions/types';
 import { MOTION_EASINGS, containerStaggerVariants } from '@/lib/motion-tokens';
@@ -23,20 +23,6 @@ import {
 } from '@/lib/portfolio-data';
 import { FEATURE_FLAGS, SITE_CONFIG } from '@/lib/app-config';
 import type { PortfolioProject, PortfolioCategoryFilter } from '@/types/portfolio';
-
-const AsciiWordmarkCanvas = dynamic(
-  () =>
-    import('@/components/ascii-wordmark/AsciiWordmarkCanvas').then((m) => m.AsciiWordmarkCanvas),
-  {
-    ssr: false,
-    loading: () => (
-      <div
-        className="relative w-full h-[325px] sm:h-[320px] md:h-[380px] overflow-hidden select-none"
-        aria-hidden="true"
-      />
-    ),
-  }
-);
 
 const GRID_ITEM_TRANSITION = {
   layout: { duration: 0.25, ease: MOTION_EASINGS.smooth },

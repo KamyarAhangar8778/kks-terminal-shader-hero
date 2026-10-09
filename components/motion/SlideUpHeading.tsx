@@ -68,9 +68,7 @@ export const SlideUpHeading: React.FC<SlideUpHeadingProps> = React.memo(function
     });
   }, [text]);
 
-  const wordVariants = prefersReducedMotion
-    ? REDUCED_MOTION_WORD_VARIANTS
-    : textRevealWordVariants;
+  const wordVariants = prefersReducedMotion ? REDUCED_MOTION_WORD_VARIANTS : textRevealWordVariants;
 
   const customTiming = useMemo(() => ({ staggerDelay, delay }), [staggerDelay, delay]);
   const viewportConfig = useMemo(

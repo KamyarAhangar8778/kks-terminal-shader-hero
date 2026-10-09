@@ -187,14 +187,17 @@ export function ensureFontsCached(): Promise<void> {
 
   fontCachePromise = (async () => {
     try {
-      const [kodeBuf, iranRegBuf, iranMedBuf, iranBoldBuf] = await Promise.all([
-        loadKodeMonoFontBuffer(),
-        fetchAndCacheFontBuffer(FONT_URLS.iranSansRegular),
-        fetchAndCacheFontBuffer(FONT_URLS.iranSansMedium),
-        fetchAndCacheFontBuffer(FONT_URLS.iranSansBold),
-      ]);
+      const hasInlineFontFaces =
+        typeof document !== 'undefined' && Boolean(document.getElementById('kks-font-faces'));
 
-      if (typeof FontFace !== 'undefined') {
+      if (!hasInlineFontFaces && typeof FontFace !== 'undefined') {
+        const [kodeBuf, iranRegBuf, iranMedBuf, iranBoldBuf] = await Promise.all([
+          loadKodeMonoFontBuffer(),
+          fetchAndCacheFontBuffer(FONT_URLS.iranSansRegular),
+          fetchAndCacheFontBuffer(FONT_URLS.iranSansMedium),
+          fetchAndCacheFontBuffer(FONT_URLS.iranSansBold),
+        ]);
+
         const facesToLoad: Promise<FontFace>[] = [];
 
         if (iranRegBuf) {
@@ -257,11 +260,9 @@ export function ensureFontsCached(): Promise<void> {
       }
 
       await Promise.allSettled([
-        document.fonts.ready,
         document.fonts.load('600 14px "Kode Mono"', 'KKS0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ~^*+'),
         document.fonts.load('700 16px "Kode Mono"', 'KKS0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
-        document.fonts.load('400 16px "IRANSans"', 'پروژه توسعه وب و رابط کاربری'),
-        document.fonts.load('700 16px "IRANSans"', 'پروژه توسعه وب و رابط کاربری'),
+        document.fonts.ready,
       ]);
     } catch {
       // Ignore font load errors in headless/test environments

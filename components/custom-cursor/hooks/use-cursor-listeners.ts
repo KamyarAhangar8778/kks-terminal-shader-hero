@@ -57,7 +57,9 @@ export function useHardwareCursorListeners({ cursorRef, innerRef }: CursorElemen
 
       const cursor = cursorRef.current;
       if (cursor) {
-        cursor.style.transform = `translate3d(${currentX.toFixed(2)}px, ${currentY.toFixed(2)}px, 0)`;
+        const rx = ((currentX * 100) | 0) * 0.01;
+        const ry = ((currentY * 100) | 0) * 0.01;
+        cursor.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
       }
 
       // Apply subtle dynamic velocity tilt during motion

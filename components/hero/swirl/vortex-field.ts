@@ -263,41 +263,6 @@ function getOrBuildGridCache(grid: FieldGrid, target: Target): GridStaticCache {
   return cache;
 }
 
-function pushCell(
-  buf: FieldBuffers,
-  atlas: GlyphAtlas,
-  glyphSlot: number,
-  x: number,
-  baseline: number,
-  r: number,
-  g: number,
-  b: number,
-  alpha: number,
-  state: { count: number }
-) {
-  if (alpha <= 0) return;
-  const o = state.count * 4;
-  if (o + 3 >= buf.bounds.length) return;
-  const uvsFlat = atlas.uvsFlat;
-  const uo = glyphSlot * 4;
-  if (uo + 3 >= uvsFlat.length) return;
-  const x0 = x - atlas.pad;
-  const y0 = baseline - atlas.baseline;
-  buf.bounds[o] = x0;
-  buf.bounds[o + 1] = y0;
-  buf.bounds[o + 2] = x0 + atlas.cellW;
-  buf.bounds[o + 3] = y0 + atlas.cellH;
-  buf.glyphUvs[o] = uvsFlat[uo]!;
-  buf.glyphUvs[o + 1] = uvsFlat[uo + 1]!;
-  buf.glyphUvs[o + 2] = uvsFlat[uo + 2]!;
-  buf.glyphUvs[o + 3] = uvsFlat[uo + 3]!;
-  buf.colors[o] = r;
-  buf.colors[o + 1] = g;
-  buf.colors[o + 2] = b;
-  buf.colors[o + 3] = alpha;
-  state.count++;
-}
-
 export interface ComposeArgs {
   grid: FieldGrid;
   atlas: GlyphAtlas;
@@ -364,6 +329,75 @@ function ensureAsciiSlots(slotOf: (ch: string, weight: number) => number) {
   }
 }
 
+interface SourceCodeCache {
+  numLines: number;
+  maxLen: number;
+  codes: Uint16Array;
+}
+
+const sourceCacheMap = new WeakMap<string[], SourceCodeCache>();
+
+function getOrBuildSourceCache(source: string[]): SourceCodeCache {
+  const existing = sourceCacheMap.get(source);
+  if (existing) return existing;
+
+  const numLines = source.length || 1;
+  let maxLen = 1;
+  for (let i = 0; i < source.length; i++) {
+    const len = source[i]!.length;
+    if (len > maxLen) maxLen = len;
+  }
+  const codes = new Uint16Array(numLines * maxLen);
+  codes.fill(32);
+  for (let r = 0; r < source.length; r++) {
+    const line = source[r]!;
+    const rowOff = r * maxLen;
+    for (let c = 0; c < line.length; c++) {
+      codes[rowOff + c] = line.charCodeAt(c);
+    }
+  }
+  const built: SourceCodeCache = { numLines, maxLen, codes };
+  sourceCacheMap.set(source, built);
+  return built;
+}
+
+const GRAD_LUT_SIZE = 1024;
+const GRAD_LUT_MASK = GRAD_LUT_SIZE - 1;
+const gradLutCache = new WeakMap<[number, number, number][], Float32Array>();
+
+function getOrBuildGradLut(stops: [number, number, number][]): Float32Array {
+  const existing = gradLutCache.get(stops);
+  if (existing) return existing;
+
+  const lut = new Float32Array(GRAD_LUT_SIZE * 3);
+  const stopsLen = stops.length;
+  for (let k = 0; k < GRAD_LUT_SIZE; k++) {
+    const t = k / GRAD_LUT_SIZE;
+    const seg = t * stopsLen;
+    const segFloor = seg | 0;
+    const i = segFloor % stopsLen;
+    const j = (i + 1) % stopsLen;
+    const f = seg - segFloor;
+    const a = stops[i]!;
+    const b = stops[j] ?? a;
+    const o = k * 3;
+    lut[o] = a[0] + (b[0] - a[0]) * f;
+    lut[o + 1] = a[1] + (b[1] - a[1]) * f;
+    lut[o + 2] = a[2] + (b[2] - a[2]) * f;
+  }
+  gradLutCache.set(stops, lut);
+  return lut;
+}
+
+const MAX_ACTIVE_SHOCKS = 8;
+const shockXArr = new Float32Array(MAX_ACTIVE_SHOCKS);
+const shockYArr = new Float32Array(MAX_ACTIVE_SHOCKS);
+const shockRingRArr = new Float32Array(MAX_ACTIVE_SHOCKS);
+const shockMinRSqArr = new Float32Array(MAX_ACTIVE_SHOCKS);
+const shockMaxRArr = new Float32Array(MAX_ACTIVE_SHOCKS);
+const shockMaxRSqArr = new Float32Array(MAX_ACTIVE_SHOCKS);
+const shockAgeFadeArr = new Float32Array(MAX_ACTIVE_SHOCKS);
+
 export function composeField(args: ComposeArgs): number {
   const {
     grid,
@@ -386,6 +420,8 @@ export function composeField(args: ComposeArgs): number {
 
   ensureAsciiSlots(slotOf);
   const gc = getOrBuildGridCache(grid, target);
+  const sc = getOrBuildSourceCache(source);
+  const { numLines, maxLen: srcMaxLen, codes: srcCodes } = sc;
 
   const spin = elapsed * 0.001;
   const turbOn = !!turbulence && turbulence > 0.001;
@@ -403,28 +439,52 @@ export function composeField(args: ComposeArgs): number {
   const logo0 = logo[0];
   const logo1 = logo[1];
   const logo2 = logo[2];
+  const halfFormation = formation * 0.5;
 
-  const lines = source;
-  const numLines = lines.length || 1;
-  const state = { count: 0 };
-
-  const trailOn = !!trail;
+  const trailOn = !!trail && trail.hasHeat;
   const ts = { heat: 0, fx: 0, fy: 0 };
-  const shockOn = !!shocks && shocks.length > 0;
+
+  let activeShockCount = 0;
+  if (shocks && shocks.length > 0) {
+    const limit = shocks.length < MAX_ACTIVE_SHOCKS ? shocks.length : MAX_ACTIVE_SHOCKS;
+    for (let k = 0; k < limit; k++) {
+      const sh = shocks[k];
+      if (!sh) continue;
+      const ringR = sh.age * SHOCK_SPEED;
+      const minR = ringR > 3.2 * SHOCK_WIDTH ? ringR - 3.2 * SHOCK_WIDTH : 0;
+      const maxR = ringR + 3.2 * SHOCK_WIDTH;
+      shockXArr[activeShockCount] = sh.x;
+      shockYArr[activeShockCount] = sh.y;
+      shockRingRArr[activeShockCount] = ringR;
+      shockMinRSqArr[activeShockCount] = minR * minR;
+      shockMaxRArr[activeShockCount] = maxR;
+      shockMaxRSqArr[activeShockCount] = maxR * maxR;
+      shockAgeFadeArr[activeShockCount] = sh.age * SHOCK_FADE;
+      activeShockCount++;
+    }
+  }
+  const shockOn = activeShockCount > 0;
+  const invShockWidth = 1 / SHOCK_WIDTH;
 
   const cols = grid.cols;
   const rows = grid.rows;
+  const halfCols = cols * 0.5;
+  const halfRows = rows * 0.5;
   const invRows = 1 / rows;
-  const halfW = cols * atlas.advance * 0.5;
-  const halfH = rows * grid.inkSize * 0.5;
-  const angleCos = cos(paint.angle);
-  const angleSin = sin(paint.angle);
+  const advance = atlas.advance;
+  const inkSize = grid.inkSize;
+  const vOffset = grid.vOffset;
+  const halfW = cols * advance * 0.5;
+  const halfH = rows * inkSize * 0.5;
+  const halfAngleCos = cos(paint.angle) * 0.5;
+  const halfAngleSin = sin(paint.angle) * 0.5;
 
   const sinDriftT = sin(spin * HUE_DRIFT_SPEED);
   const cosDriftT = cos(spin * HUE_DRIFT_SPEED);
   const stops = paint.stops;
   const stopsLen = stops.length;
   const isGrad = paint.gradient && stopsLen >= 2;
+  const gradLut = isGrad ? getOrBuildGradLut(stops) : null;
   const isAxisMode = paint.mode === 'axis';
   const paintFlow = paint.flow;
   const baseStop = stops[0] ?? [1, 1, 1];
@@ -453,16 +513,33 @@ export function composeField(args: ComposeArgs): number {
   } = gc;
 
   const waveAmp = turbOn ? WAVE_AMP * turbulence! : 0;
-  const advance = atlas.advance;
-  const inkSize = grid.inkSize;
-  const vOffset = grid.vOffset;
+  const isWavefront = wavePattern === 'wavefront';
+  const waveAmpDirX = waveAmp * waveDirX;
+  const waveAmpDirY = waveAmp * waveDirY;
 
+  const bounds = buffers.bounds;
+  const glyphUvs = buffers.glyphUvs;
+  const colors = buffers.colors;
+  const maxBufOffset = bounds.length - 4;
+  const uvsFlat = atlas.uvsFlat;
+  const maxUvOffset = uvsFlat.length - 4;
+  const atlasPad = atlas.pad;
+  const atlasBaseline = atlas.baseline;
+  const cellW = atlas.cellW;
+  const cellH = atlas.cellH;
+  const flare0 = flare ? flare[0] : 0;
+  const flare1 = flare ? flare[1] : 0;
+  const flare2 = flare ? flare[2] : 0;
+  const hasFlare = !!flare;
+
+  let count = 0;
   let cellIdx = 0;
   for (let row = 0; row < rows; row++) {
     const y = yArr[row]!;
     const baseline = vOffset + row * inkSize;
     const sny = snyArr[row]!;
     const fy = fyArr[row]!;
+    const axisRowBase = fy * halfAngleSin + 0.5 + paintFlow;
 
     for (let col = 0; col < cols; col++, cellIdx++) {
       const x = xArr[col]!;
@@ -480,12 +557,12 @@ export function composeField(args: ComposeArgs): number {
       const rx = x * cse + y * s;
       const ry = x * s - y * cse;
 
-      const sampleCol = ((rx + 1) * 0.5 * cols) | 0;
-      const sampleRow = floor((ry + 1) * 0.5 * rows);
-      const lineIdx = ((sampleRow % numLines) + numLines) % numLines;
-      const srcLine = lines[lineIdx] ?? '';
+      const sampleCol = ((rx + 1) * halfCols) | 0;
+      const sampleRow = floor((ry + 1) * halfRows);
+      let lineIdx = sampleRow % numLines;
+      if (lineIdx < 0) lineIdx += numLines;
       let chCode =
-        sampleCol >= 0 && sampleCol < srcLine.length ? srcLine.charCodeAt(sampleCol) : 32;
+        sampleCol >= 0 && sampleCol < srcMaxLen ? srcCodes[lineIdx * srcMaxLen + sampleCol]! : 32;
 
       let resolvedCode = 32;
       const inLogo = inLogoMask[cellIdx] === 1;
@@ -503,50 +580,52 @@ export function composeField(args: ComposeArgs): number {
       let dx = 0;
       let dy = 0;
 
-      if (trailOn && !inLogo && heat > 0.001) {
-        const noise = 1 + (jitterArr[cellIdx]! - 0.5) * TRAIL_NOISE;
-        const push = WAKE_PUSH * heat * trailStrength * noise;
-        dx += (ts.fx - ts.fy * 0.5) * push;
-        dy += (ts.fy + ts.fx * 0.5) * push;
-      }
-      if (shockOn && !inLogo) {
-        for (let k = 0; k < shocks!.length; k++) {
-          const sh = shocks![k];
-          if (!sh) continue;
-          const ox = snx - sh.x;
-          const oy = sny - sh.y;
-          const r = sqrt(ox * ox + oy * oy);
-          const ringR = sh.age * SHOCK_SPEED;
-          const d = (r - ringR) / SHOCK_WIDTH;
-          if (d > -3.2 && d < 3.2) {
-            const crest = exp(-d * d - sh.age * SHOCK_FADE);
+      if (!inLogo) {
+        if (trailOn && heat > 0.001) {
+          const noise = 1 + (jitterArr[cellIdx]! - 0.5) * TRAIL_NOISE;
+          const push = WAKE_PUSH * heat * trailStrength * noise;
+          dx += (ts.fx - ts.fy * 0.5) * push;
+          dy += (ts.fy + ts.fx * 0.5) * push;
+        }
+        if (shockOn) {
+          for (let k = 0; k < activeShockCount; k++) {
+            const ox = snx - shockXArr[k]!;
+            const maxR = shockMaxRArr[k]!;
+            if (ox <= -maxR || ox >= maxR) continue;
+            const oy = sny - shockYArr[k]!;
+            if (oy <= -maxR || oy >= maxR) continue;
+            const rSq = ox * ox + oy * oy;
+            if (rSq <= shockMinRSqArr[k]! || rSq >= shockMaxRSqArr[k]!) continue;
+            const r = sqrt(rSq);
+            const d = (r - shockRingRArr[k]!) * invShockWidth;
+            const crest = exp(-d * d - shockAgeFadeArr[k]!);
             if (crest > 0.002) {
-              const push = (SHOCK_PUSH * crest) / max(0.0001, r);
+              const push = (SHOCK_PUSH * crest) / (r > 0.0001 ? r : 0.0001);
               dx += ox * push;
               dy += oy * push;
             }
           }
         }
-      }
-      if (turbOn && !inLogo) {
-        if (wavePattern === 'wavefront') {
-          const w = waveSin[cellIdx]! * cosTWavePi - waveCos[cellIdx]! * sinTWavePi;
-          dx += waveAmp * w * waveDirX;
-          dy += waveAmp * w * waveDirY;
-        } else if (wavePattern === 'ripples') {
-          const r = sqrt(snx * snx + sny * sny);
-          const w = sin(r * WAVE_FREQ * PI * 1.6 - tWave * PI);
-          const inv = (waveAmp * w) / max(0.08, r);
-          dx += snx * inv;
-          dy += sny * inv;
-        } else if (wavePattern === 'flow') {
-          const nx = vnoise(snx * 1.6 + tWave * 0.4, sny * 1.6);
-          const ny = vnoise(sny * 1.6 - tWave * 0.4 + 7.3, snx * 1.6 + 3.1);
-          dx += waveAmp * 1.4 * nx;
-          dy += waveAmp * 1.4 * ny;
-        } else {
-          dx += waveAmp * 1.3 * sin(sny * WAVE_FREQ * PI * 0.9 + tWave * PI * 1.2);
-          dy += waveAmp * 0.35 * sin(snx * WAVE_FREQ * PI + tWave * PI);
+        if (turbOn) {
+          if (isWavefront) {
+            const w = waveSin[cellIdx]! * cosTWavePi - waveCos[cellIdx]! * sinTWavePi;
+            dx += waveAmpDirX * w;
+            dy += waveAmpDirY * w;
+          } else if (wavePattern === 'ripples') {
+            const r = sqrt(snx * snx + sny * sny);
+            const w = sin(r * WAVE_FREQ * PI * 1.6 - tWave * PI);
+            const inv = (waveAmp * w) / max(0.08, r);
+            dx += snx * inv;
+            dy += sny * inv;
+          } else if (wavePattern === 'flow') {
+            const nx = vnoise(snx * 1.6 + tWave * 0.4, sny * 1.6);
+            const ny = vnoise(sny * 1.6 - tWave * 0.4 + 7.3, snx * 1.6 + 3.1);
+            dx += waveAmp * 1.4 * nx;
+            dy += waveAmp * 1.4 * ny;
+          } else {
+            dx += waveAmp * 1.3 * sin(sny * WAVE_FREQ * PI * 0.9 + tWave * PI * 1.2);
+            dy += waveAmp * 0.35 * sin(snx * WAVE_FREQ * PI + tWave * PI);
+          }
         }
       }
 
@@ -565,48 +644,102 @@ export function composeField(args: ComposeArgs): number {
         cg = baseG * gain;
         cb = baseB * gain;
       } else {
-        const fx = fxArr[col]!;
-        let t = isAxisMode
-          ? (fx * angleCos + fy * angleSin) * 0.5 + 0.5 + paintFlow
-          : (((sampleRow % rows) + rows) % rows) * invRows + paintFlow;
+        let t: number;
+        if (isAxisMode) {
+          t = fxArr[col]! * halfAngleCos + axisRowBase;
+        } else {
+          let sr = sampleRow % rows;
+          if (sr < 0) sr += rows;
+          t = sr * invRows + paintFlow;
+        }
         t += sinDriftT * driftCos[cellIdx]! + cosDriftT * driftSin[cellIdx]!;
-        t = t - floor(t);
-
-        const seg = t * stopsLen;
-        const segFloor = floor(seg);
-        const i = segFloor % stopsLen;
-        const j = (i + 1) % stopsLen;
-        const f = seg - segFloor;
-        const a = stops[i]!;
-        const b = stops[j] ?? a;
-
-        cr = (a[0] + (b[0] - a[0]) * f) * bright;
-        cg = (a[1] + (b[1] - a[1]) * f) * bright;
-        cb = (a[2] + (b[2] - a[2]) * f) * bright;
+        const lutOffset = (((t * GRAD_LUT_SIZE) | 0) & GRAD_LUT_MASK) * 3;
+        cr = gradLut![lutOffset]! * bright;
+        cg = gradLut![lutOffset + 1]! * bright;
+        cb = gradLut![lutOffset + 2]! * bright;
       }
 
-      if (flare && heat > 0.001 && !inLogo) {
+      if (hasFlare && heat > 0.001 && !inLogo) {
         const ft = clamp01(heat * FLARE_GAIN * trailStrength);
-        cr += (flare[0] - cr) * ft;
-        cg += (flare[1] - cg) * ft;
-        cb += (flare[2] - cb) * ft;
+        cr += (flare0 - cr) * ft;
+        cg += (flare1 - cg) * ft;
+        cb += (flare2 - cb) * ft;
       }
+
+      const x0 = px - atlasPad;
+      const y0 = by - atlasBaseline;
+      const x1 = x0 + cellW;
+      const y1 = y0 + cellH;
+
       if (chCode !== 32) {
         const regSlot =
           chCode < 128
             ? asciiSlotReg[chCode]!
             : slotOf(String.fromCharCode(chCode), WEIGHT_REGULAR);
-        pushCell(buffers, atlas, regSlot, px, by, cr, cg, cb, 1, state);
+        const o = count * 4;
+        const uo = regSlot * 4;
+        if (o <= maxBufOffset && uo <= maxUvOffset) {
+          bounds[o] = x0;
+          bounds[o + 1] = y0;
+          bounds[o + 2] = x1;
+          bounds[o + 3] = y1;
+          glyphUvs[o] = uvsFlat[uo]!;
+          glyphUvs[o + 1] = uvsFlat[uo + 1]!;
+          glyphUvs[o + 2] = uvsFlat[uo + 2]!;
+          glyphUvs[o + 3] = uvsFlat[uo + 3]!;
+          colors[o] = cr;
+          colors[o + 1] = cg;
+          colors[o + 2] = cb;
+          colors[o + 3] = 1;
+          count++;
+        }
       }
-      if (resolvedCode !== 32) {
+      if (resolvedCode !== 32 && formation > 0) {
         const boldSlot =
           resolvedCode < 128
             ? asciiSlotBold[resolvedCode]!
             : slotOf(String.fromCharCode(resolvedCode), WEIGHT_BOLD);
-        pushCell(buffers, atlas, boldSlot, px, by, logo0, logo1, logo2, formation, state);
-        pushCell(buffers, atlas, boldSlot, px, by, hi0, hi1, hi2, formation * 0.5, state);
+        const uo = boldSlot * 4;
+        if (uo <= maxUvOffset) {
+          const u0 = uvsFlat[uo]!;
+          const u1 = uvsFlat[uo + 1]!;
+          const u2 = uvsFlat[uo + 2]!;
+          const u3 = uvsFlat[uo + 3]!;
+          let o = count * 4;
+          if (o <= maxBufOffset) {
+            bounds[o] = x0;
+            bounds[o + 1] = y0;
+            bounds[o + 2] = x1;
+            bounds[o + 3] = y1;
+            glyphUvs[o] = u0;
+            glyphUvs[o + 1] = u1;
+            glyphUvs[o + 2] = u2;
+            glyphUvs[o + 3] = u3;
+            colors[o] = logo0;
+            colors[o + 1] = logo1;
+            colors[o + 2] = logo2;
+            colors[o + 3] = formation;
+            count++;
+          }
+          o = count * 4;
+          if (o <= maxBufOffset) {
+            bounds[o] = x0;
+            bounds[o + 1] = y0;
+            bounds[o + 2] = x1;
+            bounds[o + 3] = y1;
+            glyphUvs[o] = u0;
+            glyphUvs[o + 1] = u1;
+            glyphUvs[o + 2] = u2;
+            glyphUvs[o + 3] = u3;
+            colors[o] = hi0;
+            colors[o + 1] = hi1;
+            colors[o + 2] = hi2;
+            colors[o + 3] = halfFormation;
+            count++;
+          }
+        }
       }
     }
   }
-  return state.count;
+  return count;
 }
