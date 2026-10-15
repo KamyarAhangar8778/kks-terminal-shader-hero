@@ -1,0 +1,15 @@
+# KKS — استودیو مهندسی و طراحی وب
+
+> طراحی و مهندسی وب‌سایت‌های مدرن، سریع و اختصاصی با تمرکز بر کیفیت بصری، دسترس‌پذیری و عملکرد بالا (Next.js, React 19, TypeScript, WebGL2).
+
+## بخش‌های اصلی وب‌سایت
+
+- [بخش نخست (Hero)](https://kamyarahangar8778.github.io/kks-terminal-shader-hero/#hero-terminal-section): شبیه‌ساز ترمینال و شیدر کاراکتری WebGL2 با استنسیل اختصاصی KKS.
+- [نمونه‌کارها (Portfolio)](https://kamyarahangar8778.github.io/kks-terminal-shader-hero/#portfolio-showcase-section): فهرست پروژه‌های منتخب شامل صفحات فرود، ابزارهای وب و پروژه‌های متن‌باز و سخت‌افزاری.
+- [ثبت سفارش و تماس (Contact)](https://kamyarahangar8778.github.io/kks-terminal-shader-hero/#contact-inquiry-section): ارتباط مستقیم از طریق تلگرام (`@kaveh8778`)، ایمیل (`kaveh.ahangar.kks@gmail.com`) و فرم ثبت مشخصات پروژه.
+
+## راه‌های ارتباطی
+
+- تلگرام: https://t.me/kaveh8778
+- گیت‌هاب: https://github.com/kamyarahangar8778
+- ایمیل: mailto:kaveh.ahangar.kks@gmail.com

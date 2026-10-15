@@ -1,0 +1,46 @@
+{
+  "name": "kks-terminal-shader-hero",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000 -H 0.0.0.0",
+    "build": "tsc --noEmit && NODE_ENV=production next build",
+    "build:pages": "GITHUB_PAGES=true NODE_ENV=production next build && touch out/.nojekyll",
+    "start": "next start",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "typecheck": "tsc --noEmit",
+    "knip": "knip",
+    "test": "echo 'No test files in repository by project policy'",
+    "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true});require('fs').rmSync('node_modules/.cache',{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "@tabler/icons-react": "^3.46.0",
+    "@types/three": "^0.185.4",
+    "lucide-react": "^1.40.0",
+    "motion": "^12.23.24",
+    "next": "^15.4.9",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "three": "^0.186.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^26.4.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^6.1.1",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.22.0",
+    "eslint-config-next": "^15.2.1",
+    "eslint-config-prettier": "^10.1.8",
+    "knip": "^6.34.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.9.6",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.8.2",
+    "vitest": "^5.0.0"
+  }
+}

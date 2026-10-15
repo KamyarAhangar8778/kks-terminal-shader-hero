@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/knip@5/overview/configuration-schema.json",
+  "entry": [
+    "app/**/{page,layout,loading,error,not-found,route,default,template,robots,sitemap}.{ts,tsx}",
+    "components/**/*.{ts,tsx}",
+    "hooks/**/*.{ts,tsx}",
+    "lib/**/*.{ts,tsx}",
+    "types/**/*.ts"
+  ],
+  "project": ["**/*.{ts,tsx,js,mjs,cjs,css}"],
+  "ignoreExportsUsedInFile": true,
+  "ignoreDependencies": ["eslint-config-next"],
+  "rules": {
+    "exports": "off",
+    "types": "off"
+  }
+}
