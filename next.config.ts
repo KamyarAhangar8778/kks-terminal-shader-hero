@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-  output: isGitHubPages ? 'export' : 'standalone',
+  output: 'standalone',
   basePath: basePath || undefined,
   assetPrefix: basePath || undefined,
   env: {
@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    unoptimized: isGitHubPages,
+    unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
@@ -44,7 +44,6 @@ const nextConfig: NextConfig = {
   },
 
   experimental: {
-    inlineCss: true,
     optimizePackageImports: ['lucide-react', 'motion', '@tabler/icons-react'],
   },
 
@@ -110,20 +109,12 @@ const nextConfig: NextConfig = {
         },
       }),
 
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config, { dev }) => {
     // HMR is disabled in AI Studio via DISABLE_HMR env var.
     // Do not modify — file watching is disabled to prevent flickering during agent edits.
     if (dev && process.env.DISABLE_HMR === 'true') {
       config.watchOptions = {
         ignored: /.*/,
-      };
-    }
-    if (!isServer) {
-      config.resolve = config.resolve || {};
-      config.resolve.alias = {
-        ...(config.resolve.alias || {}),
-        '../build/polyfills/polyfill-module': false,
-        'next/dist/build/polyfills/polyfill-module': false,
       };
     }
     return config;
