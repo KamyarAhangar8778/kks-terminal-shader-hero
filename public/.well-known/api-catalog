@@ -1,0 +1,26 @@
+{
+  "$schema": "https://www.ietf.org/archive/id/draft-ietf-httpapi-linkset-06.json",
+  "linkset": [
+    {
+      "anchor": "https://kamyarahangar8778.github.io/kks-terminal-shader-hero/",
+      "service-desc": [
+        {
+          "href": "https://kamyarahangar8778.github.io/kks-terminal-shader-hero/openapi.yaml",
+          "type": "application/vnd.oai.openapi+json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://kamyarahangar8778.github.io/kks-terminal-shader-hero/docs/WEBSITE.md",
+          "type": "text/markdown"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://kamyarahangar8778.github.io/kks-terminal-shader-hero/api/health",
+          "type": "application/json"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/server-card.json",
+  "serverInfo": {
+    "name": "kks-terminal-shader-mcp",
+    "version": "1.0.0",
+    "title": "KKS Engineering Studio MCP Server"
+  },
+  "transport": {
+    "type": "sse",
+    "endpoint": "https://kamyarahangar8778.github.io/kks-terminal-shader-hero/api/mcp/sse"
+  },
+  "capabilities": {
+    "tools": {
+      "listChanged": true
+    },
+    "resources": {
+      "subscribe": true,
+      "listChanged": true
+    }
+  },
+  "description": "Exposes portfolio projects, contact inquiry dispatch, and technical specs of KKS web portfolio."
+}

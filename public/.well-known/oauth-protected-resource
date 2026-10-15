@@ -1,0 +1,10 @@
+{
+  "resource": "https://kamyarahangar8778.github.io/kks-terminal-shader-hero/api/",
+  "authorization_servers": [
+    "https://auth.kamyarahangar.ir/oauth"
+  ],
+  "scopes_supported": [
+    "inquiry:write",
+    "portfolio:read"
+  ]
+}

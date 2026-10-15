@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { CustomCursor } from '@/components/custom-cursor';
 import { InitialAppLoader } from '@/components/ui/initial-app-loader';
+import { WebMCPProvider } from '@/components/common/WebMCPProvider';
 import { SITE_CONFIG, FEATURE_FLAGS } from '@/lib/app-config';
 
 export const viewport: Viewport = {
@@ -187,6 +188,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         {FEATURE_FLAGS.initialLoader ? <InitialAppLoader /> : null}
         {FEATURE_FLAGS.customCursor ? <CustomCursor /> : null}
+        <WebMCPProvider />
         {children}
       </body>
     </html>

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agentskills.io/schemas/v0.2/index.json",
+  "skills": [
+    {
+      "name": "kks-portfolio-navigator",
+      "type": "action",
+      "description": "Query KKS portfolio projects, filter by category, and inspect technical specifications.",
+      "url": "https://kamyarahangar8778.github.io/kks-terminal-shader-hero/skills/portfolio-navigator.json",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "kks-inquiry-dispatcher",
+      "type": "action",
+      "description": "Send project inquiry or contact message to KKS via Telegram and Email channels.",
+      "url": "https://kamyarahangar8778.github.io/kks-terminal-shader-hero/skills/inquiry-dispatcher.json",
+      "sha256": "d03b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

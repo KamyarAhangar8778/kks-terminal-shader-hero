@@ -1,0 +1,32 @@
+{
+  "$schema": "https://agenticresourcediscovery.org/schemas/ard-manifest-v1.json",
+  "specVersion": "1.0.0",
+  "host": {
+    "domain": "kamyarahangar8778.github.io",
+    "name": "KKS Engineering Studio",
+    "description": "High-performance web portfolio, terminal shaders, and custom web tooling."
+  },
+  "entries": [
+    {
+      "urn": "urn:air:kamyarahangar8778.github.io:mcp:kks-terminal",
+      "displayName": "KKS Terminal Shader & Portfolio MCP",
+      "type": "application/vnd.modelcontextprotocol+json",
+      "url": "https://kamyarahangar8778.github.io/kks-terminal-shader-hero/.well-known/mcp/server-card.json",
+      "representativeQueries": [
+        "What projects has KKS built?",
+        "How can I contact KKS for web development?",
+        "Show me the WebGL terminal shader code."
+      ]
+    },
+    {
+      "urn": "urn:air:kamyarahangar8778.github.io:skills:kks-portfolio",
+      "displayName": "KKS Agent Skills Index",
+      "type": "application/json",
+      "url": "https://kamyarahangar8778.github.io/kks-terminal-shader-hero/.well-known/agent-skills/index.json",
+      "representativeQueries": [
+        "What capabilities does KKS agent expose?",
+        "List available agent tools for KKS portfolio."
+      ]
+    }
+  ]
+}
