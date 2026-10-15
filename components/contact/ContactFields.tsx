@@ -13,7 +13,7 @@ const SUGGESTED_SUBJECTS = [
 ] as const;
 
 const INPUT_BASE_CLASSES =
-  'w-full bg-zinc-950/70 border border-white/[0.1] hover:border-white/[0.18] px-3.5 py-2.5 text-xs text-zinc-100 placeholder-zinc-500 rounded-lg focus:outline-none focus:border-emerald-400/80 focus:ring-1 focus:ring-emerald-400/60 focus:bg-zinc-900/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[42px]';
+  'w-full bg-zinc-950/70 border border-white/[0.1] hover:border-white/[0.18] px-3.5 py-2.5 text-xs text-zinc-100 placeholder-zinc-500 rounded-lg focus:outline-none focus:border-emerald-400/80 focus:ring-1 focus:ring-emerald-400/60 focus:bg-zinc-900/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[48px]';
 
 const USER_ICON = <IconUser className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden="true" />;
 const FOLDER_ICON = (
@@ -151,7 +151,7 @@ export const ContactSubjectField: React.FC = () => {
               type="button"
               disabled={isSubmitting}
               onClick={() => updateField('websiteSubject', subject)}
-              className={`text-[11px] px-2.5 py-1 rounded-md transition-colors border font-sans cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-1 focus-visible:ring-offset-black ${
+              className={`text-xs px-3.5 py-2.5 min-h-[48px] inline-flex items-center justify-center rounded-lg transition-colors border font-sans cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-1 focus-visible:ring-offset-black ${
                 isSelected
                   ? 'bg-emerald-500/20 border-emerald-400/60 text-emerald-300'
                   : 'bg-zinc-900/50 hover:bg-zinc-800/80 border-white/[0.06] text-zinc-400 hover:text-zinc-200'

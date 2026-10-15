@@ -11,8 +11,11 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 export const metadata: Metadata = {
-  title: `${SITE_CONFIG.brand.shortName} // ${SITE_CONFIG.brand.tagline}`,
+  metadataBase: new URL(SITE_CONFIG.brand.siteUrl),
+  title: `${SITE_CONFIG.brand.fullName} // ${SITE_CONFIG.brand.tagline}`,
   description: SITE_CONFIG.brand.description,
   keywords: [
     'طراحی وب‌سایت',
@@ -32,21 +35,33 @@ export const metadata: Metadata = {
     telephone: false,
   },
   icons: {
-    icon: '/icon.svg',
-    shortcut: '/icon.svg',
-    apple: '/icon.svg',
+    icon: [{ url: `${BASE_PATH}/icon.svg`, type: 'image/svg+xml' }],
+    shortcut: `${BASE_PATH}/icon.svg`,
+    apple: `${BASE_PATH}/apple-touch-icon.png`,
   },
+  manifest: `${BASE_PATH}/manifest.webmanifest`,
   openGraph: {
-    title: `${SITE_CONFIG.brand.shortName} // ${SITE_CONFIG.brand.tagline}`,
+    title: `${SITE_CONFIG.brand.fullName} // ${SITE_CONFIG.brand.tagline}`,
     description: SITE_CONFIG.brand.description,
     siteName: SITE_CONFIG.brand.fullName,
+    url: `${SITE_CONFIG.brand.siteUrl}/`,
     locale: SITE_CONFIG.brand.locale,
     type: 'website',
+    images: [
+      {
+        url: `${SITE_CONFIG.brand.siteUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: `${SITE_CONFIG.brand.fullName} - ${SITE_CONFIG.brand.tagline}`,
+        type: 'image/png',
+      },
+    ],
   },
   twitter: {
-    card: 'summary',
-    title: `${SITE_CONFIG.brand.shortName} // ${SITE_CONFIG.brand.tagline}`,
+    card: 'summary_large_image',
+    title: `${SITE_CONFIG.brand.fullName} // ${SITE_CONFIG.brand.tagline}`,
     description: SITE_CONFIG.brand.description,
+    images: [`${SITE_CONFIG.brand.siteUrl}/og-image.png`],
   },
   robots: {
     index: true,
@@ -72,8 +87,6 @@ const JSON_LD_WEBSITE = {
 };
 
 const JSON_LD_STRING = JSON.stringify(JSON_LD_WEBSITE).replace(/</g, '\\u003c');
-
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 const PERSIAN_UNICODE_RANGE =
   'U+0020, U+00A0, U+00AB, U+00BB, U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200F, U+FB50-FDFF, U+FE70-FEFF';
@@ -125,6 +138,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fa" dir="rtl">
       <head>
+        <link rel="icon" href={`${BASE_PATH}/icon.svg`} type="image/svg+xml" />
+        <link rel="apple-touch-icon" href={`${BASE_PATH}/apple-touch-icon.png`} />
+        <link rel="manifest" href={`${BASE_PATH}/manifest.webmanifest`} />
+        <link
+          rel="sitemap"
+          type="application/xml"
+          href={`${SITE_CONFIG.brand.siteUrl}/sitemap.xml`}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

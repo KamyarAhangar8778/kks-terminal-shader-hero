@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { SITE_CONFIG } from '@/lib/app-config';
 
 export const dynamic = 'force-static';
 
@@ -10,7 +11,7 @@ export const dynamic = 'force-static';
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: 'https://kks-terminal.dev',
+      url: `${SITE_CONFIG.brand.siteUrl}/`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,

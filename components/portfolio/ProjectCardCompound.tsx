@@ -150,9 +150,9 @@ export function ProjectCardInspectButton() {
         inspect(project);
       }}
       aria-label={`مشاهده جزئیات ${project.title}`}
-      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] text-zinc-400 hover:text-emerald-300 bg-zinc-900/50 hover:bg-zinc-800/80 border border-white/[0.08] hover:border-emerald-500/30 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-1 focus-visible:ring-offset-black"
+      className="inline-flex items-center justify-center gap-1.5 px-3 py-2 min-h-[48px] min-w-[48px] rounded-lg text-xs text-zinc-400 hover:text-emerald-300 bg-zinc-900/50 hover:bg-zinc-800/80 border border-white/[0.08] hover:border-emerald-500/30 transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-1 focus-visible:ring-offset-black"
     >
-      <Info className="w-3 h-3 text-emerald-400 shrink-0" aria-hidden="true" />
+      <Info className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden="true" />
       <span>جزئیات</span>
     </button>
   );
@@ -222,7 +222,7 @@ export function ProjectCardHeading() {
             target: '_blank',
             rel: 'noopener noreferrer',
             className:
-              'hover:text-emerald-300 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black block truncate',
+              'hover:text-emerald-300 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black block truncate min-h-[48px] py-2 flex items-center',
           }}
         />
       </ViewTransition>
@@ -233,12 +233,12 @@ export function ProjectCardHeading() {
         rel="noopener noreferrer"
         data-interactive="true"
         aria-label={`مشاهده ${project.title} در تب جدید (${project.domainText})`}
-        className="group/link inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-emerald-300 font-mono self-start transition-colors duration-200 whitespace-nowrap"
+        className="group/link inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-emerald-300 font-mono self-start transition-colors duration-200 whitespace-nowrap min-h-[48px] py-2.5 px-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
         dir="ltr"
       >
         <span>{project.domainText}</span>
         <ArrowUpRight
-          className="w-3 h-3 text-zinc-500 group-hover/link:text-emerald-300 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 shrink-0 transition-transform duration-200"
+          className="w-3.5 h-3.5 text-zinc-500 group-hover/link:text-emerald-300 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 shrink-0 transition-transform duration-200"
           aria-hidden="true"
         />
       </a>
@@ -285,11 +285,11 @@ export function ProjectCardTagList() {
         href={project.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 text-xs font-sans font-medium transition-colors shrink-0 cursor-pointer"
+        className="inline-flex items-center gap-1.5 px-4 py-2.5 min-h-[48px] rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 text-xs font-sans font-medium transition-colors shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         dir="rtl"
       >
         <span>{project.url.includes('github.com') ? 'سورس‌کد' : 'مشاهده وب‌سایت'}</span>
-        <ExternalLink className="w-3 h-3 text-emerald-400" />
+        <ExternalLink className="w-3.5 h-3.5 text-emerald-400" />
       </a>
     </div>
   );

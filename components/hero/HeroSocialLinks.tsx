@@ -55,7 +55,7 @@ export const HeroSocialLinks: React.FC = () => {
               data-interactive="true"
               whileHover={prefersReducedMotion ? undefined : SOCIAL_HOVER_ANIMATION}
               whileTap={prefersReducedMotion ? undefined : SOCIAL_TAP_ANIMATION}
-              className="group relative flex items-center justify-center w-10 h-10 min-w-[40px] min-h-[40px] rounded-lg bg-white/[0.02] border border-white/[0.06] text-zinc-300 hover:text-white hover:border-emerald-400/45 hover:bg-emerald-500/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-colors duration-150"
+              className="group relative flex items-center justify-center w-12 h-12 min-w-[48px] min-h-[48px] rounded-xl bg-white/[0.02] border border-white/[0.06] text-zinc-300 hover:text-white hover:border-emerald-400/45 hover:bg-emerald-500/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-colors duration-150"
             >
               <Icon
                 className="w-4 h-4 sm:w-[17px] sm:h-[17px] transition-transform duration-150 group-hover:drop-shadow-[0_0_8px_rgba(110,231,183,0.45)]"

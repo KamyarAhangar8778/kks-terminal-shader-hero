@@ -64,11 +64,11 @@ export const SITE_CONFIG = {
   brand: {
     shortName: 'KKS',
     fullName: 'KKS Systems',
-    tagline: 'توسعه وب و رابط‌های کاربری',
+    tagline: 'توسعه وب و طراحی رابط‌های کاربری سفارشی',
     subtitle: 'توسعه وب و طراحی رابط کاربری سفارشی با تمرکز بر عملکرد، تعامل روان و اجرای دقیق.',
     description:
-      'توسعه وب‌سایت، رابط‌های کاربری سفارشی و سیستم‌های تحت وب با تمرکز بر عملکرد سریع و پیاده‌سازی تمیز.',
-    siteUrl: 'https://kks-terminal.dev',
+      'توسعه وب‌سایت‌های مدرن، رابط‌های کاربری سفارشی و شیدرهای وب با تمرکز بر عملکرد سریع، کدنویسی استاندارد و تعاملات روان کاربری.',
+    siteUrl: 'https://kamyarahangar8778.github.io/kks-terminal-shader-hero',
     authorName: 'Kamyar Ahangar (KKS)',
     copyrightOwner: 'KKS',
     locale: 'fa_IR',

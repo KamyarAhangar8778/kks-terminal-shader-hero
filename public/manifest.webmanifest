@@ -1,0 +1,25 @@
+{
+  "name": "KKS Systems // توسعه وب و طراحی رابط‌های کاربری سفارشی",
+  "short_name": "KKS",
+  "description": "توسعه وب‌سایت‌های مدرن، رابط‌های کاربری سفارشی و شیدرهای وب با تمرکز بر عملکرد سریع، کدنویسی استاندارد و تعاملات روان کاربری.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}

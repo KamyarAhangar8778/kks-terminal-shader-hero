@@ -92,7 +92,7 @@ export const PortfolioFilterTabs: React.FC<PortfolioFilterTabsProps> = ({
               aria-controls="portfolio-projects-grid"
               onClick={() => handleSelect(tab.id)}
               onKeyDown={(e) => handleKeyDown(e, idx)}
-              className={`relative px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 min-h-[36px] sm:min-h-[38px] font-sans cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 transition-colors duration-200 select-none shrink-0 whitespace-nowrap ${
+              className={`relative px-3.5 py-2.5 rounded-lg text-xs flex items-center gap-1.5 min-h-[48px] font-sans cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 transition-colors duration-200 select-none shrink-0 whitespace-nowrap ${
                 isOptimisticActive
                   ? 'text-emerald-300 font-bold'
                   : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'

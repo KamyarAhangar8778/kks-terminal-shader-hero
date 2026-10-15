@@ -139,7 +139,7 @@ export function ContactSubmit({
         transition={{ duration: 0.12, ease: MOTION_EASINGS.entrance }}
         className={
           className ||
-          'w-full min-h-[46px] flex items-center justify-center gap-2.5 py-3 px-5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs sm:text-sm font-sans tracking-wide transition-[background-color,box-shadow,opacity] shadow-[0_0_20px_rgba(16,185,129,0.25)] hover:shadow-[0_0_28px_rgba(16,185,129,0.4)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black cursor-pointer'
+          'w-full min-h-[48px] flex items-center justify-center gap-2.5 py-3 px-5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs sm:text-sm font-sans tracking-wide transition-[background-color,box-shadow,opacity] shadow-[0_0_20px_rgba(16,185,129,0.25)] hover:shadow-[0_0_28px_rgba(16,185,129,0.4)] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black cursor-pointer'
         }
       >
         <Send

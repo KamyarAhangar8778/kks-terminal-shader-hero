@@ -93,7 +93,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 type="button"
                 onClick={onClose}
                 aria-label="بستن پنجره جزئیات"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 border border-white/[0.1] text-zinc-300 hover:text-white text-xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 min-h-[48px] min-w-[48px] rounded-lg bg-zinc-800/80 hover:bg-zinc-700 border border-white/[0.1] text-zinc-300 hover:text-white text-xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                 <X className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>بستن</span>
@@ -117,7 +117,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 href={project.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-zinc-400 hover:text-emerald-300 font-mono self-start"
+                className="text-xs text-zinc-400 hover:text-emerald-300 font-mono self-start min-h-[48px] py-2.5 flex items-center"
                 dir="ltr"
               >
                 {project.domainText}
@@ -177,7 +177,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                   href={project.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs transition-colors shadow-[0_0_16px_rgba(16,185,129,0.25)] flex-1 sm:flex-none cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 min-h-[48px] rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs transition-colors shadow-[0_0_16px_rgba(16,185,129,0.25)] flex-1 sm:flex-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                 >
                   {project.url.includes('github.com') ? (
                     <>

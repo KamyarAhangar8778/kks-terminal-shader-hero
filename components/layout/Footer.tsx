@@ -71,13 +71,13 @@ export const Footer: React.FC = () => {
                       }
                       rel={link.isExternal ? 'noopener noreferrer' : undefined}
                       aria-label={`${link.label} - ${link.ariaLabel}`}
-                      className="text-zinc-300 hover:text-emerald-300 transition-colors flex items-center justify-between group py-1.5 px-1.5 min-h-[38px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                      className="text-zinc-300 hover:text-emerald-300 transition-colors flex items-center justify-between group py-2 px-2.5 min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                     >
-                      <span className="flex items-center gap-1 whitespace-nowrap">
+                      <span className="flex items-center gap-1.5 whitespace-nowrap">
                         {link.label}
                         {link.isExternal ? (
                           <ArrowUpRight
-                            className="w-3 h-3 text-zinc-300 group-hover:text-emerald-400 shrink-0"
+                            className="w-3.5 h-3.5 text-zinc-300 group-hover:text-emerald-400 shrink-0"
                             aria-hidden="true"
                           />
                         ) : null}
@@ -105,9 +105,9 @@ export const Footer: React.FC = () => {
               type="button"
               onClick={scrollToTop}
               aria-label={`${SITE_CONFIG.telemetry.backToTopLabel} - بازگشت به ابتدای صفحه`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(12,12,15,0.85)] border border-white/[0.12] hover:border-emerald-500/60 hover:bg-emerald-950/20 text-xs text-zinc-200 hover:text-emerald-300 transition-all duration-150 hover:scale-[1.02] active:scale-[0.97] motion-reduce:transform-none min-h-[38px] whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-[rgba(12,12,15,0.85)] border border-white/[0.12] hover:border-emerald-500/60 hover:bg-emerald-950/20 text-xs text-zinc-200 hover:text-emerald-300 transition-all duration-150 hover:scale-[1.02] active:scale-[0.97] motion-reduce:transform-none min-h-[48px] whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
-              <ArrowUp className="w-3 h-3 text-emerald-400 shrink-0" aria-hidden="true" />
+              <ArrowUp className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden="true" />
               <span>{SITE_CONFIG.telemetry.backToTopLabel}</span>
             </button>
           ) : null}

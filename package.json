@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000 -H 0.0.0.0",
     "build": "tsc --noEmit && NODE_ENV=production next build",
-    "build:pages": "GITHUB_PAGES=true NODE_ENV=production next build && touch out/.nojekyll",
+    "build:pages": "GITHUB_PAGES=true NODE_ENV=production next build && touch out/.nojekyll && (cp out/kks-terminal-shader-hero/robots.txt out/robots.txt 2>/dev/null || true) && (cp out/kks-terminal-shader-hero/sitemap.xml out/sitemap.xml 2>/dev/null || true) && (cp out/kks-terminal-shader-hero/icon.svg out/icon.svg 2>/dev/null || true) && (cp out/kks-terminal-shader-hero/apple-touch-icon.png out/apple-touch-icon.png 2>/dev/null || true) && (cp out/kks-terminal-shader-hero/og-image.png out/og-image.png 2>/dev/null || true)",
     "start": "next start",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
