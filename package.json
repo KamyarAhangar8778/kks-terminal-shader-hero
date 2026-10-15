@@ -16,8 +16,12 @@
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true});require('fs').rmSync('node_modules/.cache',{recursive:true,force:true})\""
   },
   "dependencies": {
+    "@prisma/composer": "0.28.0",
+    "@prisma/composer-prisma-cloud": "0.28.0",
     "@tabler/icons-react": "^3.46.0",
     "@types/three": "^0.185.4",
+    "alchemy": "2.0.0-beta.78",
+    "effect": "4.0.0-rc.115",
     "lucide-react": "^1.40.0",
     "motion": "^12.23.24",
     "next": "^15.4.9",
@@ -39,8 +43,20 @@
     "knip": "^6.34.0",
     "postcss": "^8.5.6",
     "prettier": "^3.9.6",
+    "prisma": "8.0.0-rc.21",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.8.2",
     "vitest": "^5.0.0"
+  },
+  "overrides": {
+    "@effect/platform-bun": "4.0.0-rc.115",
+    "@effect/platform-node": "4.0.0-rc.115",
+    "@effect/platform-node-shared": "4.0.0-rc.115",
+    "@effect/sql-d1": "4.0.0-rc.115",
+    "@effect/sql-mysql2": "4.0.0-rc.115",
+    "@effect/sql-pg": "4.0.0-rc.115",
+    "@effect/sql-sqlite-do": "4.0.0-rc.115",
+    "@effect/vitest": "4.0.0-rc.115",
+    "effect": "4.0.0-rc.115"
   }
 }
