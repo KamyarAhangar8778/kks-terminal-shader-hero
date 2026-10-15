@@ -14,6 +14,9 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: `${SITE_CONFIG.brand.siteUrl}/sitemap.xml`,
+    sitemap: [
+      'https://kamyarahangar8778.github.io/sitemap.xml',
+      `${SITE_CONFIG.brand.siteUrl}/sitemap.xml`,
+    ],
   };
 }

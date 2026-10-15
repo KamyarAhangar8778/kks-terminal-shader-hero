@@ -146,6 +146,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/xml"
           href={`${SITE_CONFIG.brand.siteUrl}/sitemap.xml`}
         />
+        <link
+          rel="sitemap"
+          type="application/xml"
+          href="https://kamyarahangar8778.github.io/sitemap.xml"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
