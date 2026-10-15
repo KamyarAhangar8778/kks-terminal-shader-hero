@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-  output: 'standalone',
+  output: isGitHubPages ? 'export' : 'standalone',
   basePath: basePath || undefined,
   assetPrefix: basePath || undefined,
   env: {
