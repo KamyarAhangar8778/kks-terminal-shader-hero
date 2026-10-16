@@ -1,4 +1,3 @@
-
 <!-- KKS SYSTEMS // SIGNAL OVER NOISE -->
 
 <div align="center">
@@ -182,11 +181,62 @@ npm run start</code></pre>
 npm run typecheck
 npm run format:check</code></pre>
 
-Note: npm test is currently a placeholder script, not an automated test suite.
+Note: `npm test` is currently a placeholder script, not an automated test suite.
 
 </details>
 
-## / 04 — Source map
+## / 04 — Field notes: performance, resilience & accessibility
+
+The visual layer is the star—but a real-time effect should remain responsive, diagnosable, and usable across different devices. These are engineering principles and verification targets, not claims that every item has already been implemented.
+
+<details>
+<summary><strong>GPU budget / keep every frame intentional</strong></summary>
+
+- Treat the number of rendered pixels as a major cost. A full-screen fragment shader can become expensive on high-DPI displays.
+- Consider a capped device-pixel ratio or a smaller internal render target on slower devices, then upscale when the visual trade-off is acceptable.
+- Reuse stable GPU resources instead of repeatedly recreating buffers, textures, framebuffers, or shader programs.
+- Keep shader work proportional to the visual payoff; profile before adding more post-processing passes.
+- Avoid synchronous GPU queries in the hot render loop, and investigate WebGL console errors rather than ignoring them.
+
+Reference: [MDN — WebGL best practices](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices)
+
+</details>
+
+<details>
+<summary><strong>Graceful degradation / never strand the visitor</strong></summary>
+
+- Verify behavior when WebGL2 context creation fails or the browser loses its graphics context.
+- Provide a readable static background or fallback presentation if the shader cannot initialize.
+- Check asset-loading failures and shader compile/link logs during development.
+- Test on an integrated GPU and a mobile device—not only on a high-end desktop.
+
+Reference: [MDN — WebGL API](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API)
+
+</details>
+
+<details>
+<summary><strong>Accessibility / motion with an escape hatch</strong></summary>
+
+- Respect the operating system's reduced-motion preference for nonessential animation.
+- Make sure navigation, portfolio links, and contact actions remain usable without hover effects or a custom cursor.
+- Check contrast and text readability over the animated background.
+- Ensure keyboard focus is visible and interactive elements have meaningful accessible names.
+- Test touch interactions separately from mouse and trackpad input.
+
+References: [MDN — prefers-reduced-motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion), [W3C — WCAG 2.2](https://www.w3.org/TR/WCAG22/)
+
+</details>
+
+<details>
+<summary><strong>Static deployment / know the hosting contract</strong></summary>
+
+Next.js static export can produce HTML, CSS, and JavaScript assets for static hosting. It does not support features that require a server, so deployment must match the app's actual feature set. For GitHub Pages, verify the repository base path, asset URLs, trailing-slash behavior, and the final deployed routes.
+
+References: [Next.js — Static Exports](https://nextjs.org/docs/app/guides/static-exports), [GitHub Pages documentation](https://docs.github.com/en/pages)
+
+</details>
+
+## / 05 — Source map
 
 <pre>
 app/
@@ -207,17 +257,20 @@ lib/                       Wave math, contact helpers, utilities
 types/                     Shared TypeScript contracts
 </pre>
 
-## / 05 — Deployment checklist
+## / 06 — Pre-flight checklist
 
 Before calling the experience production-ready:
 
 - [ ] Configure and verify Telegram and EmailJS contact integrations.
 - [ ] Test WebGL2 support, frame pacing, and reduced-motion behavior on target devices.
 - [ ] Check mobile layouts and touch interactions; custom cursors are pointer-oriented.
+- [ ] Verify a graceful fallback if WebGL2 is unavailable or the context is lost.
 - [ ] Run a production build and test the deployed base path.
 - [ ] Confirm all social links and contact routes point to the intended destinations.
+- [ ] Check keyboard navigation, visible focus, and text contrast over animated layers.
+- [ ] Capture a real screenshot or short GIF of the live experience for the README.
 
-## / 06 — Project links
+## / 07 — Project links
 
 <div align="center">
 
@@ -230,7 +283,7 @@ Before calling the experience production-ready:
 
 </div>
 
-## / 07 — License
+## / 08 — License
 
 Distributed under the [MIT License](LICENSE).
 
