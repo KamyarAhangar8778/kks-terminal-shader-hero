@@ -15,7 +15,7 @@ concurrency:
 jobs:
   capture:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -34,37 +34,40 @@ jobs:
 
       - name: Capture deployed experience
         run: |
-          mkdir -p docs/media /tmp/kks-frames
-          cat > /tmp/capture.mjs <<'EOF'
+          mkdir -p docs/media ./tmp/kks-frames
+          cat > ./capture.mjs <<'EOF'
           import { chromium } from 'playwright';
 
           const url = 'https://kamyarahangar8778.github.io/kks-terminal-shader-hero/';
           const browser = await chromium.launch({ headless: true });
-          const page = await browser.newPage({
-            viewport: { width: 1440, height: 1000 },
-            deviceScaleFactor: 1
-          });
+          try {
+            const page = await browser.newPage({
+              viewport: { width: 1440, height: 1000 },
+              deviceScaleFactor: 1
+            });
 
-          await page.goto(url, { waitUntil: 'networkidle', timeout: 90000 });
-          await page.waitForTimeout(3500);
-          await page.screenshot({ path: 'docs/media/hero-desktop.png', fullPage: false });
+            await page.goto(url, { waitUntil: 'networkidle', timeout: 90000 });
+            await page.waitForTimeout(3500);
+            await page.screenshot({ path: 'docs/media/hero-desktop.png', fullPage: false });
 
-          const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
-          const viewportHeight = 1000;
-          const maxScroll = Math.max(0, pageHeight - viewportHeight);
-          const stops = [...new Set([0, maxScroll * 0.22, maxScroll * 0.48, maxScroll * 0.72, maxScroll].map(v => Math.round(v)))];
+            const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+            const viewportHeight = 1000;
+            const maxScroll = Math.max(0, pageHeight - viewportHeight);
+            const stops = [...new Set([0, maxScroll * 0.22, maxScroll * 0.48, maxScroll * 0.72, maxScroll].map(v => Math.round(v)))];
 
-          let index = 0;
-          for (const y of stops) {
-            await page.evaluate(y => window.scrollTo({ top: y, behavior: 'instant' }), y);
-            await page.waitForTimeout(900);
-            await page.screenshot({ path: `/tmp/kks-frames/frame-${String(index++).padStart(3, '0')}.png` });
+            let index = 0;
+            for (const y of stops) {
+              await page.evaluate(y => window.scrollTo({ top: y, behavior: 'instant' }), y);
+              await page.waitForTimeout(900);
+              await page.screenshot({ path: `./tmp/kks-frames/frame-${String(index++).padStart(3, '0')}.png` });
+            }
+          } finally {
+            await browser.close();
           }
-
-          await browser.close();
           EOF
-          node /tmp/capture.mjs
-          ffmpeg -y -framerate 1.2 -i /tmp/kks-frames/frame-%03d.png -vf "fps=1.2,scale=1000:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=96[p];[s1][p]paletteuse=dither=bayer:bayer_scale=3" -loop 0 docs/media/project-tour.gif
+          trap 'rm -f ./capture.mjs' EXIT
+          node ./capture.mjs
+          ffmpeg -y -framerate 1.2 -i ./tmp/kks-frames/frame-%03d.png -vf "fps=1.2,scale=1000:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=96[p];[s1][p]paletteuse=dither=bayer:bayer_scale=3" -loop 0 docs/media/project-tour.gif
 
       - name: Commit refreshed visuals
         run: |
