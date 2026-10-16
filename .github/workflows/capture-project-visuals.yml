@@ -53,13 +53,17 @@ jobs:
             const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
             const viewportHeight = 1000;
             const maxScroll = Math.max(0, pageHeight - viewportHeight);
-            const stops = [...new Set([0, maxScroll * 0.22, maxScroll * 0.48, maxScroll * 0.72, maxScroll].map(v => Math.round(v)))];
 
-            let index = 0;
-            for (const y of stops) {
+            // Capture 25 evenly spaced positions instead of five large jumps.
+            const frameCount = 25;
+            for (let index = 0; index < frameCount; index++) {
+              const progress = index / (frameCount - 1);
+              const y = Math.round(maxScroll * progress);
               await page.evaluate(y => window.scrollTo({ top: y, behavior: 'instant' }), y);
-              await page.waitForTimeout(900);
-              await page.screenshot({ path: `./tmp/kks-frames/frame-${String(index++).padStart(3, '0')}.png` });
+              await page.waitForTimeout(125);
+              await page.screenshot({
+                path: `./tmp/kks-frames/frame-${String(index).padStart(3, '0')}.png`
+              });
             }
           } finally {
             await browser.close();
@@ -69,7 +73,7 @@ jobs:
           node ./capture.mjs
           test -s docs/media/hero-desktop.png
           test -s ./tmp/kks-frames/frame-000.png
-          ffmpeg -y -framerate 1.2 -i ./tmp/kks-frames/frame-%03d.png -vf "fps=1.2,scale=1000:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=96[p];[s1][p]paletteuse=dither=bayer:bayer_scale=3" -loop 0 docs/media/project-tour.gif
+          ffmpeg -y -framerate 8 -i ./tmp/kks-frames/frame-%03d.png -vf "fps=8,scale=900:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=96[p];[s1][p]paletteuse=dither=bayer:bayer_scale=3" -loop 0 docs/media/project-tour.gif
           test -s docs/media/project-tour.gif
 
       - name: Commit refreshed visuals
