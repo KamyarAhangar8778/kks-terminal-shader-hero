@@ -67,16 +67,19 @@ jobs:
           EOF
           trap 'rm -f ./capture.mjs' EXIT
           node ./capture.mjs
+          test -s docs/media/hero-desktop.png
+          test -s ./tmp/kks-frames/frame-000.png
           ffmpeg -y -framerate 1.2 -i ./tmp/kks-frames/frame-%03d.png -vf "fps=1.2,scale=1000:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=96[p];[s1][p]paletteuse=dither=bayer:bayer_scale=3" -loop 0 docs/media/project-tour.gif
+          test -s docs/media/project-tour.gif
 
       - name: Commit refreshed visuals
         run: |
-          if git diff --quiet -- docs/media; then
+          git add docs/media/hero-desktop.png docs/media/project-tour.gif
+          if git diff --cached --quiet; then
             echo "Captured visuals are unchanged."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/media/hero-desktop.png docs/media/project-tour.gif
           git commit -m "chore: refresh live project visuals"
           git push
