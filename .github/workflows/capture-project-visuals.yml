@@ -56,19 +56,14 @@ jobs:
             const viewportHeight = 1000;
             const maxScroll = Math.max(0, pageHeight - viewportHeight);
 
-            // Record real, continuous scroll motion at a steady cadence instead of stitching sparse stills.
-            const step = 24;
+            // Capture one continuous down-scroll pass: shorter duration, consistent motion, fewer GIF frames.
+            const step = 36;
             const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
             for (let y = 0; y <= maxScroll; y += step) {
               await page.evaluate(y => window.scrollTo({ top: y, behavior: 'instant' }), y);
-              await delay(40);
+              await delay(35);
             }
-            await delay(700);
-            for (let y = maxScroll; y >= 0; y -= step * 2) {
-              await page.evaluate(y => window.scrollTo({ top: y, behavior: 'instant' }), y);
-              await delay(40);
-            }
-            await delay(500);
+            await delay(350);
             const video = page.video();
             await context.close();
             await video.saveAs('./tmp/kks-video/page-tour.webm');
@@ -80,8 +75,21 @@ jobs:
           node ./capture.mjs
           test -s docs/media/hero-desktop.png
           test -s ./tmp/kks-video/page-tour.webm
-          ffmpeg -y -i ./tmp/kks-video/page-tour.webm -vf "fps=15,scale=900:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128[p];[s1][p]paletteuse=dither=bayer:bayer_scale=3" -loop 0 docs/media/project-tour.gif
+          # First pass: balanced quality and size. Retry with smaller dimensions/fewer frames if needed.
+          ffmpeg -y -i ./tmp/kks-video/page-tour.webm -vf "fps=10,scale=720:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=64:stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=3:diff_mode=rectangle" -loop 0 docs/media/project-tour.gif
+          GIF_SIZE=$(stat -c%s docs/media/project-tour.gif)
+          echo "GIF size after first pass: $GIF_SIZE bytes"
+          if [ "$GIF_SIZE" -gt 8000000 ]; then
+            echo "GIF exceeds 8 MB; generating a smaller fallback."
+            ffmpeg -y -i ./tmp/kks-video/page-tour.webm -vf "fps=8,scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=48:stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=3:diff_mode=rectangle" -loop 0 docs/media/project-tour.gif
+            GIF_SIZE=$(stat -c%s docs/media/project-tour.gif)
+            echo "GIF size after fallback: $GIF_SIZE bytes"
+          fi
           test -s docs/media/project-tour.gif
+          if [ "$GIF_SIZE" -gt 8000000 ]; then
+            echo "GIF still exceeds the 8 MB budget after fallback."
+            exit 1
+          fi
 
       - name: Commit refreshed visuals
         run: |
