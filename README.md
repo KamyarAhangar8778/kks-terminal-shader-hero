@@ -57,6 +57,26 @@ A cyberpunk interface experiment built from **ASCII typography, real-time WebGL2
 
 </div>
 
+## / 00 — Visual transmission
+
+<div align="center">
+
+**LIVE CAPTURE / DESKTOP**
+
+![KKS Terminal Shader Hero — live desktop screenshot](./docs/media/hero-desktop.png)
+
+**MOTION STUDY / PAGE TOUR**
+
+![KKS Terminal Shader Hero — animated page tour](./docs/media/project-tour.gif)
+
+<sub>These assets are captured from the deployed site by the repository's screenshot workflow. Run it from GitHub Actions to refresh them.</sub>
+
+<a href="https://kamyarahangar8778.github.io/kks-terminal-shader-hero/"><strong>↗ OPEN THE LIVE EXPERIENCE</strong></a>
+
+</div>
+
+---
+
 ## / 00 — The concept
 
 Most hero sections ask for attention. **This one generates its own atmosphere.**
@@ -268,7 +288,7 @@ Before calling the experience production-ready:
 - [ ] Run a production build and test the deployed base path.
 - [ ] Confirm all social links and contact routes point to the intended destinations.
 - [ ] Check keyboard navigation, visible focus, and text contrast over animated layers.
-- [ ] Capture a real screenshot or short GIF of the live experience for the README.
+- [x] Add an automated workflow to capture a real screenshot and animated page tour from the deployed site.
 
 ## / 07 — Project links
 
