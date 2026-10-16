@@ -63,13 +63,13 @@ A cyberpunk interface experiment built from **ASCII typography, real-time WebGL2
 
 **LIVE CAPTURE / DESKTOP**
 
-![KKS Terminal Shader Hero — live desktop screenshot](./docs/media/hero-desktop.png)
+[▶ Click to open desktop screenshot](./docs/media/hero-desktop.png)
 
 **MOTION STUDY / PAGE TOUR**
 
-![KKS Terminal Shader Hero — animated page tour](./docs/media/project-tour.gif)
+[▶ Click to open animated page tour (GIF)](./docs/media/project-tour.gif)
 
-<sub>These assets are captured from the deployed site by the repository's screenshot workflow. Run it from GitHub Actions to refresh them.</sub>
+<sub>Previews are click-to-open to avoid automatically loading large media while browsing this README. The animated tour is captured at 8 FPS with 25 scroll positions.</sub>
 
 <a href="https://kamyarahangar8778.github.io/kks-terminal-shader-hero/"><strong>↗ OPEN THE LIVE EXPERIENCE</strong></a>
 
