@@ -65,11 +65,7 @@ A cyberpunk interface experiment built from **ASCII typography, real-time WebGL2
 
 <a href="./docs/media/hero-desktop.png"><img src="./docs/media/preview-screenshot.svg" alt="Click to load the desktop screenshot" width="720" /></a>
 
-**MOTION STUDY / SMOOTH PAGE TOUR**
-
-<a href="./docs/media/project-tour.gif"><img src="./docs/media/preview-motion.svg" alt="Click to load the animated page tour GIF" width="720" /></a>
-
-<sub>LIGHTWEIGHT PLACEHOLDERS / The full-resolution screenshot and animated GIF are requested only after you click a preview. GitHub README does not support custom CSS/JavaScript for an interactive Telegram-style skeleton, so these compact SVG placeholders provide the closest reliable native experience.</sub>
+<sub>LIGHTWEIGHT PREVIEW / Click the screenshot preview to open the full desktop capture.</sub>
 
 <a href="https://kamyarahangar8778.github.io/kks-terminal-shader-hero/"><strong>↗ OPEN THE LIVE EXPERIENCE</strong></a>
 
@@ -288,7 +284,7 @@ Before calling the experience production-ready:
 - [ ] Run a production build and test the deployed base path.
 - [ ] Confirm all social links and contact routes point to the intended destinations.
 - [ ] Check keyboard navigation, visible focus, and text contrast over animated layers.
-- [x] Add an automated workflow to capture a real screenshot and animated page tour from the deployed site.
+- [x] Add an automated workflow to capture a real screenshot from the deployed site.
 
 ## / 07 — Project links
 
