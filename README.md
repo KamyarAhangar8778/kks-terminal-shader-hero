@@ -1,25 +1,36 @@
-<!-- KKS // README -->
+
+<!-- KKS SYSTEMS // SIGNAL OVER NOISE -->
+
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=18&duration=2400&pause=900&color=72F7D2&center=true&vCenter=true&width=520&lines=SIGNAL+ACQUIRED...;WELCOME+TO+THE+KKS+TERMINAL;REALTIME+SHADERS.+RETRO+SOUL." alt="KKS terminal intro" />
+<img src="https://readme-typing-svg.demolab.com?font=Kode+Mono&weight=700&size=16&duration=2200&pause=700&color=72F7D2&center=true&vCenter=true&width=650&lines=%5BKKS+SYSTEMS%5D+BOOTING...;SIGNAL+LOCKED.+RENDERER+ONLINE.;REALTIME+SHADERS+%2F+RETRO+SOUL." alt="KKS Systems boot sequence" />
 
-# KKS // TERMINAL SHADER HERO
+# KKS / TERMINAL SHADER HERO
 
-**A signal from another terminal.**
+### NOT JUST A HERO SECTION. A LIVE SIGNAL.
 
-*Interactive ASCII · WebGL2 shaders · CRT distortion · Cyberpunk atmosphere*
-
-<br />
-
-[![Next.js](https://img.shields.io/badge/Next.js-15-000?style=flat-square&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-000?style=flat-square&logo=react&logoColor=61DAFB)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Strict-000?style=flat-square&logo=typescript&logoColor=3178C6)](https://www.typescriptlang.org/)
-[![WebGL2](https://img.shields.io/badge/WebGL2-Realtime%20Graphics-000?style=flat-square&logo=webgl&logoColor=72F7D2)](https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext)
-[![License: MIT](https://img.shields.io/badge/License-MIT-000?style=flat-square&logo=opensourceinitiative&logoColor=72F7D2)](LICENSE)
+A cyberpunk interface experiment built from **ASCII typography, real-time WebGL2 shaders, CRT artifacts, and reactive motion**.
 
 <br />
 
-**[Explore the source](https://github.com/KamyarAhangar8778/kks-terminal-shader-hero) · [Report an issue](https://github.com/KamyarAhangar8778/kks-terminal-shader-hero/issues)**
+<a href="https://kamyarahangar8778.github.io/kks-terminal-shader-hero/"><strong>↗ OPEN LIVE EXPERIENCE</strong></a>
+&nbsp;&nbsp;·&nbsp;&nbsp;
+<a href="#-boot-the-project">RUN LOCALLY</a>
+&nbsp;&nbsp;·&nbsp;&nbsp;
+<a href="https://github.com/KamyarAhangar8778/kks-terminal-shader-hero/issues">REPORT A BUG</a>
+
+<br /><br />
+
+[![Next.js](https://img.shields.io/badge/NEXT.JS-15-050505?style=for-the-badge&logo=nextdotjs&logoColor=FFFFFF)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/REACT-19-050505?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TYPESCRIPT-STRICT-050505?style=for-the-badge&logo=typescript&logoColor=3178C6)](https://www.typescriptlang.org/)
+[![WebGL2](https://img.shields.io/badge/WEBGL2-REALTIME-050505?style=for-the-badge&logo=webgl&logoColor=72F7D2)](https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext)
+[![MIT](https://img.shields.io/badge/LICENSE-MIT-050505?style=for-the-badge&logo=opensourceinitiative&logoColor=72F7D2)](LICENSE)
+
+<br />
+
+<img src="https://img.shields.io/badge/STATUS-EXPERIMENTAL-101010?style=flat-square&labelColor=101010&color=72F7D2" alt="Experimental project status" />
+<img src="https://img.shields.io/badge/BUILT_FOR-THE_BOLD-101010?style=flat-square&labelColor=101010&color=72F7D2" alt="Built for the bold" />
 
 </div>
 
@@ -27,166 +38,214 @@
 
 <div align="center">
 
-```text
-╭──────────────────────────────────────────────────────────────╮
-│  K K S     / /   SIGNAL ONLINE                                │
-│                                                              │
-│  > rendering glyph field          [██████████] 100%           │
-│  > synchronizing wavefront        [██████████] 100%           │
-│  > warming up the CRT             [██████████] 100%           │
-│                                                              │
-│  SYSTEM: WEBGL2     MODE: INTERACTIVE     MOOD: AFTER DARK     │
-╰──────────────────────────────────────────────────────────────╯
-```
+<pre>
+┌──────────────────────────────────────────────────────────────────────┐
+│  KKS.SYS  /  VISUAL SUBSYSTEM                              v0.1.0    │
+├──────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│   ██╗  ██╗██╗  ██╗███████╗                                           │
+│   ██║ ██╔╝██║ ██╔╝██╔════╝       ASCII FIELD .......... ACTIVE       │
+│   █████╔╝ █████╔╝ ███████╗       SHADER PIPELINE ...... ONLINE       │
+│   ██╔═██╗ ██╔═██╗ ╚════██║       CRT POST-PROCESS ..... ENABLED      │
+│   ██║  ██╗██║  ██╗███████║       POINTER INPUT ........ LISTENING    │
+│   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝                                           │
+│                                                                      │
+│   [ SIGNAL ACQUIRED ]  [ REALTIME RENDERING ]  [ NO STATIC MOOD ]    │
+└──────────────────────────────────────────────────────────────────────┘
+</pre>
+
+<sub>FIG. 01 — A terminal-inspired visual system, rendered in the browser.</sub>
 
 </div>
 
-## The idea
+## / 00 — The concept
 
-KKS Terminal Shader Hero is a dark, experimental landing experience built around one simple premise: **make the interface feel like a living signal, not a static page.**
+Most hero sections ask for attention. **This one generates its own atmosphere.**
 
-A custom ASCII wordmark, real-time shader work, CRT-inspired image treatment, and small responsive interactions combine into a distinct cyberpunk identity for KKS.
+KKS Terminal Shader Hero turns a portfolio landing page into an interactive visual instrument: a custom ASCII wordmark forms and bends through shader-driven motion, CRT treatments add analog texture, and pointer interactions send energy through the scene.
 
-## Inside the signal
+The result sits somewhere between a developer portfolio, a retro-futurist terminal, and a real-time graphics experiment.
+
+## / 01 — The signal chain
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-### `01 / ASCII FIELD`
+**01. ASCII / WAVEFRONT**
 
-A living KKS wordmark and character matrix rendered through custom WebGL2 shader work, including a **Wavefront ASCII Swirl** effect.
-
-</td>
-<td width="50%" valign="top">
-
-### `02 / WAVE RESPONSE`
-
-Harmonic wave motion and a reactive **shockwave** interaction add energy without turning every pointer movement into noise.
-
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-
-### `03 / CRT LAYER`
-
-Scanlines, subtle screen curvature, and chromatic separation bring the texture of old displays into a modern browser.
+A custom character field shapes the KKS wordmark with the *Wavefront ASCII Swirl* effect. Typography becomes part of the rendering system—not just text on top of a background.
 
 </td>
 <td width="50%" valign="top">
 
-### `04 / MOTION SYSTEM`
+**02. SHADER / RESPONSE**
 
-Parallax, transitions, and a custom cursor give the page movement while keeping the actual content and navigation in focus.
+Harmonic waves and click-triggered shockwaves add a physical sense of response. Interactions are designed to feel deliberate, not like random movement layered over a page.
 
 </td>
 </tr>
 <tr>
 <td width="50%" valign="top">
 
-### `05 / FONT ATLAS`
+**03. CRT / SIGNAL DAMAGE**
 
-Browser-side font caching helps repeated character-atlas work avoid unnecessary rebuilding.
+Scanlines, subtle curvature, flicker, and chromatic separation evoke phosphor displays and analog video artifacts without abandoning a clean modern layout.
 
 </td>
 <td width="50%" valign="top">
 
-### `06 / CONTACT CHANNEL`
+**04. MOTION / DEPTH**
 
-A contact experience wired for Telegram and EmailJS, with a `mailto` fallback path.
+Parallax, directional transitions, reveal effects, and a custom cursor create depth while the portfolio and contact content remain usable.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+**05. TYPE / ATLAS**
+
+Custom font loading and browser-side caching support the character-atlas workflow used by the ASCII renderer.
+
+</td>
+<td width="50%" valign="top">
+
+**06. TRANSMISSION / CONTACT**
+
+A contact flow connects Telegram and EmailJS integrations, with a mailto fallback for an alternate route.
 
 </td>
 </tr>
 </table>
 
-## The stack
+## / 02 — Under the hood
 
 <div align="center">
 
-| Layer | Tools |
+| SYSTEM | IMPLEMENTATION |
 |:--|:--|
-| App framework | **Next.js 15** · App Router |
-| UI | **React 19** · TypeScript (strict) |
-| Styling | **Tailwind CSS 4** |
-| Motion | **Motion** |
-| Graphics | **WebGL2** · Three.js · Canvas 2D |
-| Icons | Lucide · Tabler Icons |
+| **Application** | Next.js 15 · App Router |
+| **Interface** | React 19 · Strict TypeScript |
+| **Styling** | Tailwind CSS 4 |
+| **Animation** | Motion |
+| **Rendering** | WebGL2 · Three.js · Canvas 2D |
+| **Iconography** | Lucide · Tabler Icons |
 
 </div>
 
-## Boot sequence
+### Rendering philosophy
 
-Requirements: **Node.js 18.18+** and npm.
+<pre>
+USER INPUT ──┬── POINTER / CLICK
+             │
+             ▼
+       INTERACTION STATE
+             │
+             ▼
+       WAVE + SHOCKWAVE ───────┐
+                               ▼
+CHARACTER FIELD ────────► WEBGL2 SHADER PASS
+                               │
+                               ▼
+                      CRT / CHROMATIC LAYERS
+                               │
+                               ▼
+                         LIVE EXPERIENCE
+</pre>
 
-```bash
-# 1. Get the source
-git clone https://github.com/KamyarAhangar8778/kks-terminal-shader-hero.git
+<em>Conceptual flow of the visual system; the diagram describes the interaction/rendering idea, not a literal profiler trace.</em>
+
+## / 03 — Boot the project
+
+**Requirements:** Node.js 18.18+ and npm.
+
+<pre><code>git clone https://github.com/KamyarAhangar8778/kks-terminal-shader-hero.git
 cd kks-terminal-shader-hero
-
-# 2. Install dependencies
 npm install
+npm run dev</code></pre>
 
-# 3. Start the development server
-npm run dev
-```
+Open [http://localhost:3000](http://localhost:3000) and let the signal load.
 
-Open **http://localhost:3000**.
+<details>
+<summary><strong>Production build</strong></summary>
 
-### Production mode
+<pre><code>npm run build
+npm run start</code></pre>
 
-```bash
-npm run build
-npm run start
-```
+</details>
 
-### Quality checks
+<details>
+<summary><strong>Code quality commands</strong></summary>
 
-```bash
-npm run lint
+<pre><code>npm run lint
 npm run typecheck
-npm run format:check
-```
+npm run format:check</code></pre>
 
-> `npm test` is currently a placeholder script; it does not run an automated test suite.
+Note: npm test is currently a placeholder script, not an automated test suite.
 
-## Project map
+</details>
 
-```text
+## / 04 — Source map
+
+<pre>
 app/
-  globals.css              Global styling
-  layout.tsx               Root layout, metadata, fonts
-  page.tsx                 Page composition
+  globals.css              Global visual language
+  layout.tsx               Metadata, fonts, root layout
+  page.tsx                 Main experience composition
 
 components/
-  ascii-wordmark/          ASCII wordmark rendering
-  hero/                    Canvas, CRT and glitch layers
+  ascii-wordmark/          ASCII KKS rendering
+  hero/                    WebGL canvas, CRT and glitch layers
   portfolio/               Project showcase
-  contact/                 Contact form and channel logic
-  custom-cursor/           Pointer treatment
-  layout/                  Footer and layout components
+  contact/                 Contact and transmission flow
+  custom-cursor/           Custom pointer treatment
+  layout/                  Footer and shared layout
 
-hooks/                     Interaction and animation hooks
+hooks/                     Interaction and animation logic
 lib/                       Wave math, contact helpers, utilities
-types/                     Shared TypeScript types
-```
+types/                     Shared TypeScript contracts
+</pre>
 
-## Before going live
+## / 05 — Deployment checklist
 
-- Configure and verify the Telegram and EmailJS integrations used by the contact form.
-- Test WebGL2 support and performance on the target browsers and devices.
-- Run a production build and review responsive behavior at real viewport sizes.
+Before calling the experience production-ready:
 
-## License
+- [ ] Configure and verify Telegram and EmailJS contact integrations.
+- [ ] Test WebGL2 support, frame pacing, and reduced-motion behavior on target devices.
+- [ ] Check mobile layouts and touch interactions; custom cursors are pointer-oriented.
+- [ ] Run a production build and test the deployed base path.
+- [ ] Confirm all social links and contact routes point to the intended destinations.
 
-Released under the [MIT License](LICENSE).
+## / 06 — Project links
+
+<div align="center">
+
+| CHANNEL | DESTINATION |
+|:--|:--|
+| **LIVE** | [Open the deployed experience ↗](https://kamyarahangar8778.github.io/kks-terminal-shader-hero/) |
+| **SOURCE** | [Browse the repository ↗](https://github.com/KamyarAhangar8778/kks-terminal-shader-hero) |
+| **ISSUES** | [Report a problem ↗](https://github.com/KamyarAhangar8778/kks-terminal-shader-hero/issues) |
+| **MAINTAINER** | [KKS Systems ↗](https://github.com/KamyarAhangar8778) |
+
+</div>
+
+## / 07 — License
+
+Distributed under the [MIT License](LICENSE).
 
 ---
 
 <div align="center">
 
-**KKS — built to feel like a signal from another terminal.**
+### KKS SYSTEMS
 
-<sub>LESS UI NOISE. MORE SIGNAL.</sub>
+**LESS UI NOISE. MORE SIGNAL.**
+
+<sub>END OF TRANSMISSION // THANK YOU FOR VISITING.</sub>
+
+<br />
+
+<a href="#kks-terminal-shader-hero">[ BACK TO TOP ↑ ]</a>
 
 </div>
